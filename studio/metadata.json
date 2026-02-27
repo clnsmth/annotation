@@ -1,0 +1,5 @@
+{
+  "name": "Semantic EML Annotator",
+  "description": "A smart assistant for enriching Ecological Metadata Language (EML) documents with semantic annotations using AI-driven ontology recommendations.",
+  "requestFramePermissions": []
+}

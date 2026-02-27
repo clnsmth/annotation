@@ -1,0 +1,88 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ignoredPackages">
+        <list>
+          <option value="annotated-doc" />
+          <option value="annotated-types" />
+          <option value="anyio" />
+          <option value="bzip2" />
+          <option value="ca-certificates" />
+          <option value="certifi" />
+          <option value="click" />
+          <option value="dnspython" />
+          <option value="email-validator" />
+          <option value="exceptiongroup" />
+          <option value="fastapi" />
+          <option value="fastapi-cli" />
+          <option value="fastapi-core" />
+          <option value="h11" />
+          <option value="h2" />
+          <option value="hpack" />
+          <option value="hyperframe" />
+          <option value="idna" />
+          <option value="jinja2" />
+          <option value="libexpat" />
+          <option value="libffi" />
+          <option value="liblzma" />
+          <option value="libsqlite" />
+          <option value="libuv" />
+          <option value="libzlib" />
+          <option value="markdown-it-py" />
+          <option value="markupsafe" />
+          <option value="mdurl" />
+          <option value="ncurses" />
+          <option value="openssl" />
+          <option value="pip" />
+          <option value="pydantic" />
+          <option value="pydantic-core" />
+          <option value="pygments" />
+          <option value="python-dotenv" />
+          <option value="python-multipart" />
+          <option value="python_abi" />
+          <option value="pyyaml" />
+          <option value="readline" />
+          <option value="rich" />
+          <option value="rich-toolkit" />
+          <option value="setuptools" />
+          <option value="shellingham" />
+          <option value="sniffio" />
+          <option value="starlette" />
+          <option value="tk" />
+          <option value="tomli" />
+          <option value="typer" />
+          <option value="typer-slim" />
+          <option value="typer-slim-standard" />
+          <option value="typing-extensions" />
+          <option value="typing-inspection" />
+          <option value="tzdata" />
+          <option value="uvicorn" />
+          <option value="uvicorn-standard" />
+          <option value="uvloop" />
+          <option value="watchfiles" />
+          <option value="websockets" />
+          <option value="wheel" />
+          <option value="yaml" />
+          <option value="colorama" />
+          <option value="iniconfig" />
+          <option value="packaging" />
+          <option value="pluggy" />
+          <option value="pytest" />
+          <option value="black" />
+          <option value="mypy_extensions" />
+          <option value="pathspec" />
+          <option value="platformdirs" />
+          <option value="pytokens" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="webapp.run.*" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

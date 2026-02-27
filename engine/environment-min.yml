@@ -1,0 +1,13 @@
+name: annotation-engine
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - fastapi
+  - uvicorn
+  - pydantic
+  - httpx
+  - pytest
+  - ruff
+  - requests
+  - daiquiri
