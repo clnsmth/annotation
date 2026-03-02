@@ -16,7 +16,6 @@ consists of two components:
 - REST API for annotation recommendations and ontology term proposals
 - Email notifications for new term proposals
 - User selection logging to feed back into recommender training and improvement
-- Mock recommender for local development; real recommender for production
 - Interactive UI with upload → annotate → export workflow
 
 ## Project Structure
