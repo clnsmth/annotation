@@ -13,8 +13,7 @@ consists of two components:
 ## Features
 
 - AI-powered annotation recommendations for EML elements
-- REST API for annotation recommendations and ontology term proposals
-- Email notifications for new term proposals
+- REST API for annotation recommendations and ontology term proposals, with email notifications for new proposals
 - User selection logging to feed back into recommender training and improvement
 - Interactive UI with upload → annotate → export workflow
 
