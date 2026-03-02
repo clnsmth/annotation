@@ -57,3 +57,4 @@ Before submitting any changes, please ensure you have completed the following:
     - [ ] Manually verify UI changes and functionality by running the Vite development server.
 3.  **Documentation**:
     - [ ] Update any relevant comments or documentation if the architecture or configuration changes.
+    - [ ] Update this `AGENTS.md` file if any environment setup, tools, or best practices change.
