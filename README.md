@@ -12,7 +12,7 @@ consists of two components:
 
 ## Features
 
-- Annotation recommendations for EML attributes and geographic coverage
+- AI-powered annotation recommendations for EML elements
 - REST API for annotation recommendations and ontology term proposals
 - Email notifications for new term proposals
 - User selection logging to feed back into recommender training and improvement
