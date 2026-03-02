@@ -9,7 +9,7 @@ This project consists of two main components:
 The backend is responsible for the annotation engine logic and email notifications.
 
 ### Environment Setup
-- Use Conda to manage the environment: `conda env create -f engine/environment.yml`.
+- Use Conda to manage the environment: `conda env create -f engine/environment-min.yml`.
 - Primary source code is located in `engine/webapp/`.
 
 ### Development & Running
