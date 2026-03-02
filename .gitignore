@@ -208,3 +208,35 @@ __marimo__/
 
 # Mac OS:
 .DS_Store
+
+# ---------------------------------------------------------------------------
+# Node.js / Vite / Studio specific
+# ---------------------------------------------------------------------------
+
+# Dependencies
+# These are installed by package managers and should not be versioned.
+/studio/node_modules/
+
+# Build output
+# This directory is generated when you build the project.
+/studio/dist/
+
+# Vite internal cache
+/studio/.vite/
+
+# Environment variables
+# These files contain local settings and potentially sensitive keys.
+/studio/.env.local
+/studio/.env.*.local
+
+# Log files
+/studio/npm-debug.log*
+/studio/yarn-error.log*
+/studio/pnpm-debug.log*
+
+# IDE / Editor directories
+# These contain user-specific settings.
+# The `.idea` directory in `studio` is currently tracked by git.
+# To ignore it, you should first remove it from the git index by running:
+# git rm -r --cached studio/.idea
+/studio/.idea/
