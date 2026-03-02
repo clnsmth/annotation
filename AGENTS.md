@@ -46,6 +46,25 @@ The frontend is a React application built with Vite and TypeScript.
   ```
 - **Testing**: There are currently no automated tests for the frontend. Please verify changes manually by running the development server.
 
+## Commit Message Guidelines
+
+We use the **Angular commit style** to streamline the release process via Python Semantic Release.
+
+### Format
+`type(scope): <subject> [#issue]`
+
+- **Type**: Must be one of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`.
+- **Scope**: (Optional) The module or area of the change (e.g., `engine`, `studio`, `api`).
+- **Subject**: A short, imperative-voice summary (e.g., "add login endpoint").
+- **Body**: (Optional) Detailed explanation.
+- **Footer**: (Optional) For breaking changes or issue references (e.g., `Closes #123`).
+
+### Constraints
+- **Imperative Voice**: Use "add", "fix", "update" instead of "added", "fixes", "updated".
+- **Header Length**: Keep the header (type + scope + subject) under **52 characters**.
+- **Body Length**: Wrap the body text at **72 characters**.
+- **Issue Referencing**: Automatically close issues using keywords (e.g., `Closes #123`) in the footer or subject when relevant.
+
 ## Pre-flight Checklist for Agents
 
 Before submitting any changes, please ensure you have completed the following:
@@ -58,3 +77,7 @@ Before submitting any changes, please ensure you have completed the following:
 3.  **Documentation**:
     - [ ] Update any relevant comments or documentation if the architecture or configuration changes.
     - [ ] Update this `AGENTS.md` file if any environment setup, tools, or best practices change.
+4.  **Submission**:
+    - [ ] Use the **Angular commit style** for the commit message.
+    - [ ] Ensure the header is under 52 characters and the body is wrapped at 72 characters.
+    - [ ] Include issue references to automatically close related issues.
