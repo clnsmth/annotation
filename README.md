@@ -32,17 +32,15 @@ See [`engine/README.md`](engine/README.md) and
 
 ### Prerequisites
 
-- [Python 3.13+](https://www.python.org/) and
-  [Conda](https://docs.conda.io/) (for the engine)
+- [Pixi](https://pixi.sh) (for the engine)
 - [Node.js](https://nodejs.org/) (for the studio)
 
 ### Engine
 
 ```bash
-conda env create -f engine/environment-min.yml
-conda activate annotation-engine
 cd engine
-uvicorn webapp.run:app --reload
+pixi install
+pixi run serve
 ```
 
 The API will be available at <http://localhost:8000>.
