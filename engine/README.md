@@ -16,11 +16,11 @@ The EML Annotation Engine is a backend service for the [EML Annotation Studio](h
 
 ### Prerequisites
 - Python 3.13+
-- (Recommended) Create and activate a virtual environment:
+- [Pixi](https://pixi.sh) for environment and package management
+- (Recommended) Install dependencies with Pixi:
 
 ```bash
-conda env create -f environment-min.yml
-conda activate annotation-engine
+pixi install
 ```
 
 ### Running the API
@@ -28,7 +28,7 @@ conda activate annotation-engine
 To start the FastAPI server (for development):
 
 ```bash
-uvicorn webapp.run:app --reload --host 0.0.0.0 --port 8000
+pixi run serve
 ```
 
 The API will be available at http://localhost:8000
@@ -38,7 +38,7 @@ The API will be available at http://localhost:8000
 To run the test suite:
 
 ```bash
-pytest
+pixi run -e dev test
 ```
 
 ### Configuration
