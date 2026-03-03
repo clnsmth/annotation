@@ -1,9 +1,27 @@
 [project]
 name = "annotation-engine"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.133",
+    "uvicorn>=0.41",
+    "pydantic>=2.12",
+    "httpx>=0.28",
+    "requests>=2.32",
+    "daiquiri>=3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0",
+    "ruff>=0.15",
+]
+
+[tool.pixi.project]
 channels = ["conda-forge"]
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
-[dependencies]
+[tool.pixi.dependencies]
 python = "3.13.*"
 fastapi = ">=0.133"
 uvicorn = ">=0.41"
@@ -12,17 +30,17 @@ httpx = ">=0.28"
 requests = ">=2.32"
 daiquiri = ">=3.0"
 
-[tasks]
+[tool.pixi.tasks]
 serve = "uvicorn webapp.run:app --reload"
 
-[feature.dev.dependencies]
+[tool.pixi.feature.dev.dependencies]
 pytest = ">=9.0"
 ruff = ">=0.15"
 
-[feature.dev.tasks]
+[tool.pixi.feature.dev.tasks]
 test = "pytest"
 lint = "ruff check webapp/ tests/"
 format = "ruff format webapp/ tests/"
 
-[environments]
+[tool.pixi.environments]
 dev = { features = ["dev"], solve-group = "default" }
