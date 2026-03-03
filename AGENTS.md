@@ -9,13 +9,13 @@ This project consists of two main components:
 The backend is responsible for the annotation engine logic and email notifications.
 
 ### Environment Setup
-- Use Conda to manage the environment: `conda env create -f engine/environment-min.yml`.
+- Use Pixi to manage the environment: `pixi install` (within the `engine/` directory).
 - Primary source code is located in `engine/webapp/`.
 
 ### Development & Running
 - **Running the server**: From the `engine/` directory, run:
   ```bash
-  uvicorn webapp.run:app --reload
+  pixi run serve
   ```
 - **Configuration**: Managed in `engine/webapp/config.py`.
   - For local development and testing, keep `USE_MOCK_RECOMMENDATIONS = True`.
@@ -24,12 +24,12 @@ The backend is responsible for the annotation engine logic and email notificatio
 ### Quality Control
 - **Linting & Formatting**: Use `ruff` on both the source and tests.
   ```bash
-  ruff check engine/webapp/ engine/tests/
-  ruff format engine/webapp/ engine/tests/
+  pixi run -e dev lint
+  pixi run -e dev format
   ```
 - **Testing**: Use `pytest` to run the test suite from the `engine/` directory.
   ```bash
-  pytest
+  pixi run -e dev test
   ```
 
 ## Frontend (Studio)
@@ -70,8 +70,8 @@ We use the **Angular commit style** to streamline the release process via Python
 Before submitting any changes, please ensure you have completed the following:
 
 1.  **Backend Changes**:
-    - [ ] Run `ruff check` and `ruff format` on `engine/webapp/` and `engine/tests/`.
-    - [ ] Run `pytest` from the `engine/` directory and ensure all tests pass.
+    - [ ] Run `pixi run -e dev lint` and `pixi run -e dev format` from `engine/`.
+    - [ ] Run `pixi run -e dev test` from `engine/` and ensure all tests pass.
 2.  **Frontend Changes**:
     - [ ] Manually verify UI changes and functionality by running the Vite development server.
 3.  **Documentation**:

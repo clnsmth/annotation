@@ -1,0 +1,28 @@
+[project]
+name = "annotation-engine"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+python = "3.13.*"
+fastapi = ">=0.133"
+uvicorn = ">=0.41"
+pydantic = ">=2.12"
+httpx = ">=0.28"
+requests = ">=2.32"
+daiquiri = ">=3.0"
+
+[tasks]
+serve = "uvicorn webapp.run:app --reload"
+
+[feature.dev.dependencies]
+pytest = ">=9.0"
+ruff = ">=0.15"
+
+[feature.dev.tasks]
+test = "pytest"
+lint = "ruff check webapp/ tests/"
+format = "ruff format webapp/ tests/"
+
+[environments]
+dev = { features = ["dev"], solve-group = "default" }
