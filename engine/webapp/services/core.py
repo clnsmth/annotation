@@ -51,11 +51,11 @@ def send_email_notification(proposal: ProposalRequest) -> None:
     Label: {proposal.term_details.label}
     Description: 
     {proposal.term_details.description}
-    Evidence Source: {proposal.term_details.evidence_source or 'None provided'}
+    Evidence Source: {proposal.term_details.evidence_source or "None provided"}
     --- Submitter Information ---
     Email: {proposal.submitter_info.email}
-    ORCID: {proposal.submitter_info.orcid_id or 'None provided'}
-    Attribution Consent: {'Yes' if proposal.submitter_info.attribution_consent else 'No'}
+    ORCID: {proposal.submitter_info.orcid_id or "None provided"}
+    Attribution Consent: {"Yes" if proposal.submitter_info.attribution_consent else "No"}
     """
     msg.attach(MIMEText(body, "plain"))
     try:
