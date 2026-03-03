@@ -11,7 +11,7 @@ from webapp.config import Config
 
 
 @pytest.fixture(name="proposal_request")
-def proposal_request_fixture():
+def proposal_request_fixture() -> ProposalRequest:
     """
     Fixture for a sample ProposalRequest used in email notification tests.
     """
@@ -30,14 +30,12 @@ def proposal_request_fixture():
     )
 
 
-def test_send_email_notification_success(monkeypatch, proposal_request):
+def test_send_email_notification_success(
+    monkeypatch: pytest.MonkeyPatch, proposal_request: ProposalRequest
+) -> None:
     """
     Test that send_email_notification completes successfully with valid SMTP settings.
     """
-    monkeypatch.setenv("PROPOSAL_RECIPIENT_EMAIL", Config.VOCABULARY_PROPOSAL_RECIPIENT)
-    monkeypatch.setenv("SMTP_USER", "user@example.com")
-    monkeypatch.setenv("SMTP_PASSWORD", "password")
-
     mock_smtp = MagicMock()
     monkeypatch.setattr("smtplib.SMTP", lambda *args, **kwargs: mock_smtp)
 
@@ -48,31 +46,46 @@ def test_send_email_notification_success(monkeypatch, proposal_request):
     assert mock_smtp.quit.called
 
 
-# def test_send_email_notification_missing_recipient(monkeypatch, proposal_request, capsys):
-#     monkeypatch.delenv("PROPOSAL_RECIPIENT_EMAIL", raising=False)
-#     monkeypatch.setenv("SMTP_USER", "user@example.com")
-#     monkeypatch.setenv("SMTP_PASSWORD", "password")
-#     send_email_notification(proposal_request)
-#     captured = capsys.readouterr()
-#     assert "PROPOSAL_RECIPIENT_EMAIL not set" in captured.out
-#     assert "Payload received" in captured.out
-
-# def test_send_email_notification_missing_credentials(monkeypatch, proposal_request, capsys):
-#     monkeypatch.setenv("PROPOSAL_RECIPIENT_EMAIL", Config.VOCABULARY_PROPOSAL_RECIPIENT)
-#     monkeypatch.delenv("SMTP_USER", raising=False)
-#     monkeypatch.delenv("SMTP_PASSWORD", raising=False)
-#     send_email_notification(proposal_request)
-#     captured = capsys.readouterr()
-#     assert "SMTP credentials not set" in captured.out
+def test_send_email_notification_missing_recipient(
+    monkeypatch: pytest.MonkeyPatch,
+    proposal_request: ProposalRequest,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """
+    Test that send_email_notification skips dispatch and logs a warning when
+    VOCABULARY_PROPOSAL_RECIPIENT is not configured.
+    """
+    monkeypatch.setattr(Config, "VOCABULARY_PROPOSAL_RECIPIENT", "")
+    send_email_notification(proposal_request)
+    captured = capsys.readouterr()
+    assert "VOCABULARY_PROPOSAL_RECIPIENT not set" in captured.out
+    assert "Payload received" in captured.out
 
 
-def test_send_email_notification_exception(monkeypatch, proposal_request, capsys):
+def test_send_email_notification_missing_credentials(
+    monkeypatch: pytest.MonkeyPatch,
+    proposal_request: ProposalRequest,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """
+    Test that send_email_notification skips dispatch and logs a warning when
+    SMTP credentials are not configured.
+    """
+    monkeypatch.setattr(Config, "SMTP_USER", "")
+    monkeypatch.setattr(Config, "SMTP_PASSWORD", "")
+    send_email_notification(proposal_request)
+    captured = capsys.readouterr()
+    assert "SMTP credentials not set" in captured.out
+
+
+def test_send_email_notification_exception(
+    monkeypatch: pytest.MonkeyPatch,
+    proposal_request: ProposalRequest,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """
     Test that send_email_notification handles SMTPException gracefully.
     """
-    monkeypatch.setenv("PROPOSAL_RECIPIENT_EMAIL", Config.VOCABULARY_PROPOSAL_RECIPIENT)
-    monkeypatch.setenv("SMTP_USER", "user@example.com")
-    monkeypatch.setenv("SMTP_PASSWORD", "password")
 
     class FailingSMTP:
         """Mock SMTP class that always raises SMTPException on sendmail."""
@@ -96,23 +109,32 @@ def test_send_email_notification_exception(monkeypatch, proposal_request, capsys
     assert "Failed to send email" in captured.out
 
 
-# if __name__ == "__main__":
-#     from webapp.config import Config
-#     from webapp.run import ProposalRequest, TermDetails, SubmitterInfo, send_email_notification
-#     import sys
-#     print("Running live email notification test...")
-#     proposal = ProposalRequest(
-#         target_vocabulary="TestVocab",
-#         term_details=TermDetails(
-#             label="LiveTestLabel",
-#             description="Live test of email notification system.",
-#             evidence_source="UnitTest"
-#         ),
-#         submitter_info=SubmitterInfo(
-#             email=Config.VOCABULARY_PROPOSAL_RECIPIENT,
-#             orcid_id="0000-0000-0000-0000",
-#             attribution_consent=True
-#         )
-#     )
-#     send_email_notification(proposal)
-#     print("Live email notification test completed.")
+def test_send_email_notification_oserror(
+    monkeypatch: pytest.MonkeyPatch,
+    proposal_request: ProposalRequest,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """
+    Test that send_email_notification handles OSError (e.g. connection refused) gracefully.
+    """
+
+    class ConnectionFailingSMTP:
+        """Mock SMTP class that raises OSError on sendmail."""
+
+        def starttls(self):
+            """Mock starttls method."""
+
+        def login(self, u, p):
+            """Mock login method."""
+
+        def sendmail(self, u, r, t):
+            """Mock sendmail method that raises OSError."""
+            raise OSError("Connection refused")
+
+        def quit(self):
+            """Mock quit method."""
+
+    monkeypatch.setattr("smtplib.SMTP", lambda *args, **kwargs: ConnectionFailingSMTP())
+    send_email_notification(proposal_request)
+    captured = capsys.readouterr()
+    assert "Failed to send email" in captured.out
