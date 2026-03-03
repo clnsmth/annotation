@@ -1,3 +1,5 @@
+![Experimental](https://img.shields.io/badge/status-experimental-orange) ![WIP](https://img.shields.io/badge/status-WIP-yellow)
+
 # Annotation Studio & Engine
 
 A web application for creating semantic annotations for [Ecological Metadata
