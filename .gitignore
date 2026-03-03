@@ -209,6 +209,9 @@ __marimo__/
 # Mac OS:
 .DS_Store
 
+# Gemini CLI
+.gemini/
+
 # Project Configuration:
 **/config.py
 
