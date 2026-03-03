@@ -44,7 +44,10 @@ The frontend is a React application built with Vite and TypeScript.
   ```bash
   npm run dev
   ```
-- **Testing**: There are currently no automated tests for the frontend. Please verify changes manually by running the development server.
+- **Testing**: Use `vitest` to run the test suite from the `studio/` directory.
+  ```bash
+  npm test
+  ```
 
 ## Commit Message Guidelines
 
