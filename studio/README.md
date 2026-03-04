@@ -28,3 +28,8 @@ To run the test suite once:
 
 To run tests in watch mode:
 `npx vitest`
+
+## Linting
+
+This project uses ESLint. To check for any linting errors, run:
+`npm run lint`
