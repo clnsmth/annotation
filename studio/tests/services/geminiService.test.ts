@@ -54,14 +54,14 @@ describe('GeminiService', () => {
                     ]
                 }
             ])
-        } as any);
+        } as unknown as Response);
 
         const recommendationsMap = await geminiService.getRecommendations(mockElements);
 
         expect(global.fetch).toHaveBeenCalledTimes(1);
 
         // Assert the shape of the grouped payload sent to fetch
-        const fetchArgs = (global.fetch as any).mock.calls[0];
+        const fetchArgs = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
         const requestBody = JSON.parse(fetchArgs[1].body);
 
         // DATASET should not be in the request body
@@ -100,7 +100,7 @@ describe('GeminiService', () => {
             ok: false,
             status: 500,
             statusText: 'Internal Server Error'
-        } as any);
+        } as unknown as Response);
 
         const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
 

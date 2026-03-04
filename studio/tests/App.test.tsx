@@ -1,9 +1,8 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import App from '../src/App';
-import { geminiService } from '../src/services/geminiService';
 
 // Mock the geminiService to prevent actual network calls during tests
 vi.mock('../src/services/geminiService', () => ({

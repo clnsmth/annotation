@@ -55,7 +55,7 @@ describe('SuggestTermModal component', () => {
         global.fetch = vi.fn().mockResolvedValue({
             ok: true,
             json: () => Promise.resolve({ success: true })
-        } as any);
+        } as unknown as Response);
 
         render(<SuggestTermModal isOpen={true} onClose={mockOnClose} initialTermLabel="TestLabel" />);
 
@@ -77,7 +77,7 @@ describe('SuggestTermModal component', () => {
             expect(global.fetch).toHaveBeenCalledTimes(1);
         });
 
-        const fetchArgs = (global.fetch as any).mock.calls[0];
+        const fetchArgs = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
         expect(fetchArgs[0]).toBe('http://localhost:8000/api/proposals');
         const requestBody = JSON.parse(fetchArgs[1].body);
         expect(requestBody.target_vocabulary).toBe('ENVO');
