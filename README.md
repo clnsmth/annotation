@@ -1,4 +1,4 @@
-![Experimental](https://img.shields.io/badge/status-experimental-orange) ![WIP](https://img.shields.io/badge/status-WIP-yellow)
+![Experimental](https://img.shields.io/badge/status-experimental-orange) ![WIP](https://img.shields.io/badge/status-WIP-yellow) [![CI](https://github.com/clnsmth/annotation/actions/workflows/ci.yml/badge.svg)](https://github.com/clnsmth/annotation/actions/workflows/ci.yml)
 
 # Annotation Studio & Engine
 
