@@ -49,6 +49,12 @@ The frontend is a React application built with Vite and TypeScript.
   npm test
   ```
 
+### Quality Control
+- **Linting**: Use `eslint` to run checks from the `studio/` directory.
+  ```bash
+  npm run lint
+  ```
+
 ## Commit Message Guidelines
 
 We use the **Angular commit style** to streamline the release process via Python Semantic Release.
@@ -76,6 +82,7 @@ Before submitting any changes, please ensure you have completed the following:
     - [ ] Run `pixi run -e dev lint` and `pixi run -e dev format` from `engine/`.
     - [ ] Run `pixi run -e dev test` from `engine/` and ensure all tests pass.
 2.  **Frontend Changes**:
+    - [ ] Run `npm run lint` from `studio/` to ensure no linting warnings exist.
     - [ ] Manually verify UI changes and functionality by running the Vite development server.
 3.  **Documentation**:
     - [ ] Update any relevant comments or documentation if the architecture or configuration changes.
