@@ -42,7 +42,30 @@ test.describe('Annotation Studio End-to-End', () => {
         await expect(page.getByRole('button', { name: 'Review & Export' })).toBeVisible({ timeout: 10000 });
 
         // 6. Interact with the Editor
-        // Expand the "SurveyResults" context group
+
+        // Expand the "SurveyResults" context group so its children are visible
+        await page.getByText('SurveyResults', { exact: true }).click();
+
+        // 6a. Search functionality
+        await page.getByPlaceholder('Search elements...').fill('AirTemperature');
+        await expect(page.getByText('AirTemperature_F')).toBeVisible();
+        await page.getByPlaceholder('Search elements...').fill(''); // clear search
+
+        // 6b. Grouping functionality
+        // First collapse SurveyResults to ensure children are hidden
+        await page.getByText('SurveyResults', { exact: true }).first().click();
+        await expect(page.getByText('AirTemperature_F')).not.toBeVisible();
+
+        // Switch to Group by Name
+        await page.getByRole('button', { name: 'Group by Name' }).click();
+
+        // AirTemperature_F should now be visible as its own group header
+        await expect(page.getByText('AirTemperature_F', { exact: true })).toBeVisible();
+
+        // Switch back to Group by Entity
+        await page.getByRole('button', { name: 'Group by Entity' }).click(); // switch back
+
+        // Expand the "SurveyResults" context group (state resets after grouping toggle)
         await page.getByText('SurveyResults', { exact: true }).click();
 
         // 7. Verify AI Recommendations are visible
@@ -72,6 +95,24 @@ test.describe('Annotation Studio End-to-End', () => {
         await page.getByPlaceholder('Property URI').fill('http://example.com/contains');
         await page.getByPlaceholder('Annotation Label').fill('Custom E2E Term');
         await page.getByPlaceholder('Annotation URI').fill('http://example.com/e2e');
+
+        // 8a. Test Suggest New Term Modal
+        await page.route('http://localhost:8000/api/proposals', async route => {
+            await route.fulfill({ status: 200, json: { status: 'success' } });
+        });
+        await page.getByRole('button', { name: 'Suggest New Term' }).click();
+
+        await page.getByPlaceholder('e.g., Soil Type, Land Use, Sensor Model, or specific ontology (ENVO, SWEET)').fill('ENVO');
+        // Fill description and email to meet validation requirements
+        await page.getByPlaceholder('What is this term and what distinguishes it from similar concepts?').fill('This is an E2E test description that is at least 10 chars.');
+        await page.getByPlaceholder('name@institution.edu').fill('test@example.com');
+        await page.getByRole('button', { name: 'Submit Proposal' }).click();
+
+        // Verify success and close modal
+        await expect(page.locator('text=Suggestion Submitted!')).toBeVisible();
+        await page.getByRole('button', { name: 'Close' }).click();
+
+        // Resume adding custom annotation
         await page.getByRole('button', { name: 'Save' }).click();
 
         // Verify the custom term was added
