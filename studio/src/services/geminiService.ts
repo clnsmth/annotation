@@ -1,7 +1,7 @@
 import { AnnotatableElement, OntologyTerm } from '../types';
 
 export class GeminiService {
-  
+
   isConfigured(): boolean {
     return true; // We assume the local backend is available
   }
@@ -11,12 +11,12 @@ export class GeminiService {
    */
   async getRecommendations(elements: AnnotatableElement[]): Promise<Map<string, OntologyTerm[]>> {
     // Group elements by type for the backend coordinator
-    const groupedPayload: Record<string, any[]> = {};
+    const groupedPayload: Record<string, Record<string, string | undefined>[]> = {};
     let totalCount = 0;
 
     elements.forEach(e => {
       // Exclude DATASET level elements from AI recommendations per requirements
-      if (e.type === 'DATASET') return; 
+      if (e.type === 'DATASET') return;
 
       // Map internal type 'COVERAGE' to 'GEOGRAPHICCOVERAGE' for the backend
       const key = e.type === 'COVERAGE' ? 'GEOGRAPHICCOVERAGE' : e.type;
@@ -62,17 +62,17 @@ export class GeminiService {
 
       const result = await response.json() as { id: string, recommendations: OntologyTerm[] }[];
       console.log('[GeminiService] Response received:', result);
-      
+
       const map = new Map<string, OntologyTerm[]>();
-      
+
       if (Array.isArray(result)) {
         result.forEach(item => {
-           if (item.id && Array.isArray(item.recommendations)) {
-               map.set(item.id, item.recommendations);
-           }
+          if (item.id && Array.isArray(item.recommendations)) {
+            map.set(item.id, item.recommendations);
+          }
         });
       }
-      
+
       return map;
 
     } catch (error) {

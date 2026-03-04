@@ -10,7 +10,7 @@ interface FileUploadProps {
 export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, onLoadExample, error }) => {
   // Default to skipping recommendations (AI off by default)
   const [skipRecommendations, setSkipRecommendations] = useState(true);
-  
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) processFile(file);
@@ -30,6 +30,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, onLoadExam
     e.stopPropagation();
     const file = e.dataTransfer.files?.[0];
     if (file) processFile(file);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [skipRecommendations]); // Depend on skipRecommendations so the current state is used
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -39,7 +40,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, onLoadExam
 
   return (
     <div className="max-w-2xl mx-auto mt-12">
-      <div 
+      <div
         className={`bg-white border-2 border-dashed rounded-2xl p-12 text-center transition-colors shadow-sm relative ${error ? 'border-red-300 bg-red-50/10' : 'border-indigo-200 hover:border-indigo-400'}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
@@ -62,15 +63,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, onLoadExam
         <p className="text-slate-500 mb-8 max-w-md mx-auto">
           Drag and drop your .xml file here, or click to browse. We support EML version 2.2.0 or later.
         </p>
-        
+
         <div className="flex flex-col items-center gap-4">
           <label className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer w-48">
             <span>Select XML File</span>
-            <input 
-              type="file" 
-              className="hidden" 
-              accept=".xml" 
-              onChange={handleFileChange} 
+            <input
+              type="file"
+              className="hidden"
+              accept=".xml"
+              onChange={handleFileChange}
             />
           </label>
 
@@ -80,7 +81,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, onLoadExam
             <div className="flex-grow h-px bg-slate-200"></div>
           </div>
 
-          <button 
+          <button
             onClick={(e) => {
               e.stopPropagation();
               onLoadExample(skipRecommendations);
@@ -94,33 +95,33 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, onLoadExam
 
         {/* AI Toggle Switch */}
         <div className="mt-8 pt-6 border-t border-slate-100 flex justify-center">
-           <label className="flex items-center cursor-pointer group" onClick={(e) => e.stopPropagation()}>
-             <div className="relative">
-               <input 
-                 type="checkbox" 
-                 className="sr-only" 
-                 checked={!skipRecommendations}
-                 onChange={() => setSkipRecommendations(!skipRecommendations)}
-               />
-               <div className={`block w-10 h-6 rounded-full transition-colors ${!skipRecommendations ? 'bg-indigo-600' : 'bg-slate-300'}`}></div>
-               <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${!skipRecommendations ? 'transform translate-x-4' : ''}`}></div>
-             </div>
-             <div className="ml-3 flex items-center text-sm font-medium text-slate-600 group-hover:text-slate-800 transition-colors">
-               <Sparkles className={`w-4 h-4 mr-1.5 ${!skipRecommendations ? 'text-indigo-500' : 'text-slate-400'}`} />
-               Enable AI Recommendations
-             </div>
-           </label>
+          <label className="flex items-center cursor-pointer group" onClick={(e) => e.stopPropagation()}>
+            <div className="relative">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={!skipRecommendations}
+                onChange={() => setSkipRecommendations(!skipRecommendations)}
+              />
+              <div className={`block w-10 h-6 rounded-full transition-colors ${!skipRecommendations ? 'bg-indigo-600' : 'bg-slate-300'}`}></div>
+              <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${!skipRecommendations ? 'transform translate-x-4' : ''}`}></div>
+            </div>
+            <div className="ml-3 flex items-center text-sm font-medium text-slate-600 group-hover:text-slate-800 transition-colors">
+              <Sparkles className={`w-4 h-4 mr-1.5 ${!skipRecommendations ? 'text-indigo-500' : 'text-slate-400'}`} />
+              Enable AI Recommendations
+            </div>
+          </label>
         </div>
-        
+
         <div className="mt-6 flex justify-center space-x-8 text-sm text-slate-400">
-           <div className="flex items-center">
-             <FileCode className="w-4 h-4 mr-2" />
-             <span>EML 2.2.0 Compatible</span>
-           </div>
-           <div className="flex items-center">
-             <FileCode className="w-4 h-4 mr-2" />
-             <span>Auto-Detection</span>
-           </div>
+          <div className="flex items-center">
+            <FileCode className="w-4 h-4 mr-2" />
+            <span>EML 2.2.0 Compatible</span>
+          </div>
+          <div className="flex items-center">
+            <FileCode className="w-4 h-4 mr-2" />
+            <span>Auto-Detection</span>
+          </div>
         </div>
       </div>
     </div>

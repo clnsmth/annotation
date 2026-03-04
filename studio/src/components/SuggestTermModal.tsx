@@ -55,7 +55,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    
+
     // Target Vocabulary
     if (!formData.target_vocabulary || formData.target_vocabulary.length < 2) {
       newErrors.target_vocabulary = "Target vocabulary must be at least 2 characters.";
@@ -98,11 +98,11 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      
+
       if (!response.ok) {
         throw new Error(`Server returned ${response.status}: ${response.statusText}`);
       }
-      
+
       console.log("Proposal successfully submitted to backend.");
       setIsSubmitting(false);
       setIsSuccess(true);
@@ -121,7 +121,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
     onClose();
   };
 
-  const updateField = (section: keyof FormData, field: string, value: any) => {
+  const updateField = (section: keyof FormData, field: string, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       [section]: {
@@ -134,7 +134,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 flex-shrink-0">
           <div>
@@ -155,11 +155,11 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
               </div>
               <h3 className="text-xl font-bold text-slate-800 mb-2">Suggestion Submitted!</h3>
               <p className="text-slate-600 max-w-md">
-                Thank you for contributing to the community ontology. Your suggestion for 
-                <span className="font-semibold text-indigo-600"> "{formData.term_details.label}" </span> 
+                Thank you for contributing to the community ontology. Your suggestion for
+                <span className="font-semibold text-indigo-600"> "{formData.term_details.label}" </span>
                 has been received and will be reviewed by a curator.
               </p>
-              <button 
+              <button
                 onClick={handleClose}
                 className="mt-8 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors"
               >
@@ -168,7 +168,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-8">
-              
+
               {submitError && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3 text-sm text-red-700">
                   <AlertTriangle className="w-5 h-5 shrink-0" />
@@ -182,11 +182,11 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
                   <BookOpen className="w-4 h-4" />
                   <h3 className="text-sm font-bold uppercase tracking-wider">Target Context</h3>
                 </div>
-                
+
                 <div className="space-y-1">
                   <label className="block text-sm font-medium text-slate-700">Target Vocabulary or Category <span className="text-red-500">*</span></label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     value={formData.target_vocabulary}
                     onChange={(e) => setFormData(prev => ({ ...prev, target_vocabulary: e.target.value }))}
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-indigo-100 placeholder:text-slate-500 ${errors.target_vocabulary ? 'border-red-500 bg-red-900/20' : 'border-slate-700 bg-slate-800'}`}
@@ -209,7 +209,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1 md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700">Suggested Term Name <span className="text-red-500">*</span></label>
-                    <input 
+                    <input
                       type="text"
                       value={formData.term_details.label}
                       onChange={(e) => updateField('term_details', 'label', e.target.value)}
@@ -222,7 +222,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
 
                   <div className="space-y-1 md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700">Description <span className="text-red-500">*</span></label>
-                    <textarea 
+                    <textarea
                       value={formData.term_details.description}
                       onChange={(e) => updateField('term_details', 'description', e.target.value)}
                       rows={3}
@@ -237,7 +237,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
 
                   <div className="space-y-1 md:col-span-2">
                     <label className="block text-sm font-medium text-slate-700">Reference / Source</label>
-                    <input 
+                    <input
                       type="text"
                       value={formData.term_details.evidence_source}
                       onChange={(e) => updateField('term_details', 'evidence_source', e.target.value)}
@@ -259,7 +259,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="block text-sm font-medium text-slate-700">Contact Email <span className="text-red-500">*</span></label>
-                    <input 
+                    <input
                       type="email"
                       value={formData.submitter_info.email}
                       onChange={(e) => updateField('submitter_info', 'email', e.target.value)}
@@ -271,7 +271,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
 
                   <div className="space-y-1">
                     <label className="block text-sm font-medium text-slate-700">ORCID URL</label>
-                    <input 
+                    <input
                       type="text"
                       value={formData.submitter_info.orcid_id}
                       onChange={(e) => updateField('submitter_info', 'orcid_id', e.target.value)}
@@ -281,32 +281,32 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
                     {errors.orcid_id && <p className="text-xs text-red-500 mt-1">{errors.orcid_id}</p>}
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3 pt-2">
-                   <div className="flex h-5 items-center">
-                     <input
-                       id="attribution_consent"
-                       type="checkbox"
-                       checked={formData.submitter_info.attribution_consent}
-                       onChange={(e) => updateField('submitter_info', 'attribution_consent', e.target.checked)}
-                       className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                     />
-                   </div>
-                   <label htmlFor="attribution_consent" className="text-sm text-slate-600 cursor-pointer select-none">
-                     I consent to be listed as the term creator in the ontology metadata.
-                   </label>
+                  <div className="flex h-5 items-center">
+                    <input
+                      id="attribution_consent"
+                      type="checkbox"
+                      checked={formData.submitter_info.attribution_consent}
+                      onChange={(e) => updateField('submitter_info', 'attribution_consent', e.target.checked)}
+                      className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                    />
+                  </div>
+                  <label htmlFor="attribution_consent" className="text-sm text-slate-600 cursor-pointer select-none">
+                    I consent to be listed as the term creator in the ontology metadata.
+                  </label>
                 </div>
               </section>
 
               <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
-                <button 
+                <button
                   type="button"
                   onClick={handleClose}
                   className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg text-sm font-medium transition-colors"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   type="submit"
                   disabled={isSubmitting}
                   className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium transition-colors flex items-center gap-2 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"

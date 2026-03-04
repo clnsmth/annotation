@@ -58,6 +58,13 @@ npm run dev
 
 The app will be available at <http://localhost:3000>.
 
+You can check the Studio code for linting errors with:
+
+```bash
+cd studio
+npm run lint
+```
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
