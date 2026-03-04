@@ -25,6 +25,8 @@ jobs:
         run: pixi run -e dev lint
       - name: Format Check
         run: pixi run -e dev ruff format --check webapp/ tests/
+      - name: Setup Config
+        run: cp webapp/config.py.template webapp/config.py
       - name: Test
         run: pixi run -e dev test
 
