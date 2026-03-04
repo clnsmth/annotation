@@ -81,7 +81,9 @@ def test_normalize_recommender_response_dict_caps_at_five() -> None:
     _normalize_recommender_response limits each column to 5 items when the input
     is a dict keyed by column name.
     """
-    raw: Dict[str, List[Dict[str, Any]]] = {"col1": [{"concept_name": str(i)} for i in range(10)]}
+    raw: Dict[str, List[Dict[str, Any]]] = {
+        "col1": [{"concept_name": str(i)} for i in range(10)]
+    }
     result = _normalize_recommender_response(raw)
     assert len(result) == 5
     assert all(r["column_name"] == "col1" for r in result)
