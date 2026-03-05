@@ -246,3 +246,13 @@ __marimo__/
 # To ignore it, you should first remove it from the git index by running:
 # git rm -r --cached studio/.idea
 /studio/.idea/
+
+# Agent Directories
+.agents/
+
+# Playwright
+/studio/test-results/
+/studio/playwright-report/
+/studio/blob-report/
+/studio/playwright/.cache/
+/studio/playwright/.auth/
