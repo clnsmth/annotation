@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import { FileUpload } from '../src/components/FileUpload';
@@ -79,5 +79,26 @@ describe('FileUpload component', () => {
 
         expect(handleFileLoaded).toHaveBeenCalledTimes(1);
         expect(handleFileLoaded).toHaveBeenCalledWith('test.xml', '<eml><dataset></dataset></eml>', true); // AI off by default
+    });
+
+    it('handles drag and drop file upload securely', async () => {
+        const handleFileLoaded = vi.fn();
+        render(<FileUpload onFileLoaded={handleFileLoaded} onLoadExample={vi.fn()} />);
+
+        const file = new File(['<eml><dataset></dataset></eml>'], 'dropped.xml', { type: 'text/xml' });
+        const dropzone = screen.getByText('Upload EML Metadata').parentElement!;
+
+        // Trigger drop event
+        fireEvent.drop(dropzone, {
+            dataTransfer: {
+                files: [file],
+            },
+        });
+
+        // Wait for asynchronous FileReader
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        expect(handleFileLoaded).toHaveBeenCalledTimes(1);
+        expect(handleFileLoaded).toHaveBeenCalledWith('dropped.xml', '<eml><dataset></dataset></eml>', true);
     });
 });
