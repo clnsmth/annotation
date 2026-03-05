@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { SuggestTermModal } from '../src/components/SuggestTermModal';
@@ -37,6 +37,53 @@ describe('SuggestTermModal component', () => {
         expect(screen.getByText('Term label must be at least 2 characters.')).toBeInTheDocument();
         expect(screen.getByText('Description must be at least 10 characters.')).toBeInTheDocument();
         expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument();
+    });
+
+    it('shows validation errors for invalid ORCID URLs', async () => {
+        const user = userEvent.setup();
+        render(<SuggestTermModal isOpen={true} onClose={mockOnClose} />);
+
+        // Fill out required valid fields
+        await user.type(screen.getByPlaceholderText(/e\.g\., Soil Type/i), 'ENVO');
+        await user.type(screen.getByPlaceholderText(/e\.g\., Oligotrophic Peatland/i), 'Valid Label');
+        await user.type(screen.getByPlaceholderText(/What is this term/i), 'Valid description that is long enough.');
+        await user.type(screen.getByPlaceholderText(/name@institution\.edu/i), 'test@example.com');
+
+        // Add invalid ORCID
+        await user.type(screen.getByPlaceholderText(/https:\/\/orcid\.org/i), 'invalid-orcid-format');
+
+        const submitBtn = screen.getByRole('button', { name: /submit proposal/i });
+        await user.click(submitBtn);
+
+        expect(screen.getByText('Invalid ORCID URL format (e.g., https://orcid.org/0000-0000-0000-0000).')).toBeInTheDocument();
+        expect(global.fetch).not.toHaveBeenCalled();
+    });
+
+    it('submits successfully with a valid ORCID URL', async () => {
+        const user = userEvent.setup();
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({ success: true })
+        } as unknown as Response);
+
+        render(<SuggestTermModal isOpen={true} onClose={mockOnClose} />);
+
+        // Fill out required valid fields
+        await user.type(screen.getByPlaceholderText(/e\.g\., Soil Type/i), 'ENVO');
+        await user.type(screen.getByPlaceholderText(/e\.g\., Oligotrophic Peatland/i), 'Valid Label');
+        await user.type(screen.getByPlaceholderText(/What is this term/i), 'Valid description that is long enough.');
+        await user.type(screen.getByPlaceholderText(/name@institution\.edu/i), 'test@example.com');
+
+        // Add valid ORCID
+        await user.type(screen.getByPlaceholderText(/https:\/\/orcid\.org/i), 'https://orcid.org/0000-0001-2345-6789');
+
+        const submitBtn = screen.getByRole('button', { name: /submit proposal/i });
+        await user.click(submitBtn);
+
+        await waitFor(() => {
+            expect(global.fetch).toHaveBeenCalledTimes(1);
+        });
+        expect(await screen.findByText('Suggestion Submitted!')).toBeInTheDocument();
     });
 
     it('calls onClose when cancel or close button is clicked', async () => {
