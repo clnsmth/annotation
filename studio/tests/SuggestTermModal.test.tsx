@@ -41,6 +41,8 @@ describe('SuggestTermModal component', () => {
 
     it('shows validation errors for invalid ORCID URLs', async () => {
         const user = userEvent.setup();
+        global.fetch = vi.fn(); // Mock fetch so the assertions have a valid spy
+
         render(<SuggestTermModal isOpen={true} onClose={mockOnClose} />);
 
         // Fill out required valid fields
