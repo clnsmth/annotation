@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import App from '../src/App';
 
-// Mock the geminiService to prevent actual network calls during tests
-vi.mock('../src/services/geminiService', () => ({
-    geminiService: {
+// Mock the recommenderService to prevent actual network calls during tests
+vi.mock('../src/services/recommenderService', () => ({
+    recommenderService: {
         getRecommendations: vi.fn().mockResolvedValue(new Map())
     }
 }));
@@ -39,7 +39,7 @@ describe('App Integration', () => {
         // Step 1: Upload Step
         expect(screen.getByText('Upload EML Metadata')).toBeInTheDocument();
 
-        // Click "Load Example Data" (AI is off by default so geminiService won't even be called)
+        // Click "Load Example Data" (AI is off by default so recommenderService won't even be called)
         const loadExampleBtn = screen.getByRole('button', { name: /Load Example Data/i });
         await user.click(loadExampleBtn);
 
