@@ -214,6 +214,7 @@ __marimo__/
 
 # Project Configuration:
 **/config.py
+/studio/src/config.ts
 
 # ---------------------------------------------------------------------------
 # Node.js / Vite / Studio specific
