@@ -47,6 +47,8 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Setup Config
+        run: cp src/config.template.ts src/config.ts
       - name: Test (Unit & Component)
         run: npm test
       - name: Install Playwright Browsers
