@@ -1,4 +1,5 @@
 import { AnnotatableElement, OntologyTerm } from '../types';
+import { getApiUrl } from '../config';
 
 export class RecommenderService {
 
@@ -42,7 +43,7 @@ export class RecommenderService {
     }
 
     // Payload is now the grouped object directly
-    const url = 'http://localhost:8000/api/recommendations';
+    const url = getApiUrl('recommendations');
 
     console.log(`[RecommenderService] Preparing to POST ${totalCount} items (grouped by type) to ${url}`);
 
