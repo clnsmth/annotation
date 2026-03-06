@@ -70,7 +70,7 @@ test.describe('Annotation Studio End-to-End', () => {
 
         // 7. Verify AI Recommendations are visible
         // Since AI is enabled, the mock API in E2E (or real API if running backend) should return something.
-        // Actually, in E2E, the real local backend needs to be running for geminiService to work, 
+        // Actually, in E2E, the real local backend needs to be running for recommenderService to work, 
         // or we're just testing the UI flow. We'll wait to see if any recommendation badge appears.
         // We expect the text "Accept Recommendation" or a specific ontology term badge to be visible.
         // If the backend isn't mocked, this depends on whether the `engine` is running. 

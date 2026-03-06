@@ -3,7 +3,7 @@ import { Layout } from './components/Layout';
 import { FileUpload } from './components/FileUpload';
 import { AnnotationEditor } from './components/AnnotationEditor';
 import { emlParser } from './services/emlParser';
-import { geminiService } from './services/geminiService';
+import { recommenderService } from './services/recommenderService';
 import { AnnotatableElement, OntologyTerm } from './types';
 import { Loader2, Download, CheckCircle, RotateCcw, AlertTriangle } from 'lucide-react';
 import { EXAMPLE_EML_XML } from './constants/mockData';
@@ -60,7 +60,7 @@ export default function App() {
         console.log('Initiating recommendation request to backend...');
         setLoadingMsg('Consulting Knowledge Base (AI)...');
         // 2. Fetch Recommendations from Backend
-        recommendationsMap = await geminiService.getRecommendations(parsedElements);
+        recommendationsMap = await recommenderService.getRecommendations(parsedElements);
         console.log(`Received recommendations for ${recommendationsMap.size} elements`);
       } else {
         console.log('Skipping AI recommendations per user selection.');
