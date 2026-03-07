@@ -248,9 +248,6 @@ __marimo__/
 # git rm -r --cached studio/.idea
 /studio/.idea/
 
-# Agent Directories
-.agents/
-
 # Playwright
 /studio/test-results/
 /studio/playwright-report/
