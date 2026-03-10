@@ -84,7 +84,14 @@ class TestParseEmlExtraction:
 
     def test_entity_element_uses_xml_id(self, elements):
         """dataTable entity preserves its XML id= attribute."""
-        entity = next((e for e in elements if e["type"] == "DATATABLE" and e["name"] == "SurveyResults"), None)
+        entity = next(
+            (
+                e
+                for e in elements
+                if e["type"] == "DATATABLE" and e["name"] == "SurveyResults"
+            ),
+            None,
+        )
         assert entity is not None
         assert entity["id"] == "24632bb8dbdace8be4693baf5c9e4b97"
         assert entity["name"] == "SurveyResults"
@@ -125,7 +132,11 @@ class TestParseEmlExtraction:
     def test_attribute_no_annotation_pending(self, elements):
         """Attribute without existing annotations has status=PENDING."""
         target = next(
-            (e for e in elements if e["type"] == "ATTRIBUTE" and e["name"] == "SurveyID"),
+            (
+                e
+                for e in elements
+                if e["type"] == "ATTRIBUTE" and e["name"] == "SurveyID"
+            ),
             None,
         )
         assert target is not None
@@ -220,14 +231,16 @@ class TestExportEml:
         """
         elements = parse_eml(EXAMPLE_EML_XML)
         target = next(e for e in elements if e["name"] == "SurveyID")
-        target["currentAnnotations"] = [{
-            "label": "Identifier",
-            "uri": "http://purl.obolibrary.org/obo/IAO_0000578",
-            "ontology": "IAO",
-            "confidence": 1.0,
-            "propertyLabel": "has unit",
-            "propertyUri": "http://qudt.org/schema/qudt/hasUnit",
-        }]
+        target["currentAnnotations"] = [
+            {
+                "label": "Identifier",
+                "uri": "http://purl.obolibrary.org/obo/IAO_0000578",
+                "ontology": "IAO",
+                "confidence": 1.0,
+                "propertyLabel": "has unit",
+                "propertyUri": "http://qudt.org/schema/qudt/hasUnit",
+            }
+        ]
 
         updated_xml = export_eml(EXAMPLE_EML_XML, elements)
         assert "<annotation>" in updated_xml
@@ -343,14 +356,16 @@ class TestDocumentExportEndpoint:
         """POST /api/documents/export returns XML with approved annotation injected."""
         elements = parse_eml(EXAMPLE_EML_XML)
         target = next(e for e in elements if e["name"] == "SurveyID")
-        target["currentAnnotations"] = [{
-            "label": "Identifier",
-            "uri": "http://purl.obolibrary.org/obo/IAO_0000578",
-            "ontology": "IAO",
-            "confidence": 1.0,
-            "propertyLabel": "has unit",
-            "propertyUri": "http://qudt.org/schema/qudt/hasUnit",
-        }]
+        target["currentAnnotations"] = [
+            {
+                "label": "Identifier",
+                "uri": "http://purl.obolibrary.org/obo/IAO_0000578",
+                "ontology": "IAO",
+                "confidence": 1.0,
+                "propertyLabel": "has unit",
+                "propertyUri": "http://qudt.org/schema/qudt/hasUnit",
+            }
+        ]
 
         payload = {
             "eml_xml": EXAMPLE_EML_XML,
