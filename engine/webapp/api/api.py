@@ -7,8 +7,8 @@ import uuid
 from typing import Any, Dict
 
 import daiquiri
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Body
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Body, UploadFile, File
+from fastapi.responses import JSONResponse, Response
 
 from webapp.services.core import (
     ProposalRequest,
@@ -16,7 +16,9 @@ from webapp.services.core import (
     recommend_for_attribute,
     recommend_for_geographic_coverage,
 )
+from webapp.services.eml_parser import parse_eml, export_eml
 from webapp.models.log_selection import LogSelection
+from webapp.models.document_request import ExportRequest
 
 daiquiri.setup()
 logger = daiquiri.getLogger(__name__)
@@ -110,6 +112,64 @@ async def log_selection(payload: LogSelection):
     print(json.dumps(payload.model_dump(), indent=2))
     print("---------------------------------\n")
     return {"status": "received"}
+
+
+@router.post("/api/documents/targets")
+async def get_document_targets(file: UploadFile = File(...)) -> JSONResponse:
+    """
+    Accepts an uploaded EML file and returns the list of annotatable targets
+    extracted by the canonical backend EML parser.
+
+    :param file: Uploaded EML XML file (multipart/form-data)
+    :return: JSONResponse containing a list of AnnotatableElement objects
+    :raises HTTPException: 422 if the EML version is unsupported or the XML is malformed
+    """
+    try:
+        contents = await file.read()
+        xml_string = contents.decode("utf-8", errors="replace")
+        elements = parse_eml(xml_string)
+        logger.info(
+            "get_document_targets: parsed %d elements from '%s'.",
+            len(elements),
+            file.filename,
+        )
+        return JSONResponse(content=elements, status_code=200)
+    except ValueError as e:
+        logger.warning("get_document_targets validation error: %s", e)
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("get_document_targets unexpected error: %s", e)
+        raise HTTPException(
+            status_code=500, detail="Internal server error parsing EML document."
+        ) from e
+
+
+@router.post("/api/documents/export")
+def export_document(request: ExportRequest) -> Response:
+    """
+    Accepts an ExportRequest (original EML XML + annotatable elements with user
+    decisions) and returns the updated EML XML with annotations applied.
+
+    :param request: ExportRequest containing eml_xml and elements
+    :return: Plain-text XML response with annotations applied
+    :raises HTTPException: 422 if the XML is malformed, 500 on export errors
+    """
+    try:
+        # Convert Pydantic models to plain dicts for the service layer
+        elements_dicts = [el.model_dump() for el in request.elements]
+        updated_xml = export_eml(request.eml_xml, elements_dicts)
+        logger.info(
+            "export_document: exported EML with %d elements.", len(elements_dicts)
+        )
+        return Response(content=updated_xml, media_type="application/xml")
+    except ValueError as e:
+        logger.warning("export_document validation error: %s", e)
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("export_document unexpected error: %s", e)
+        raise HTTPException(
+            status_code=500, detail="Internal server error exporting EML document."
+        ) from e
 
 
 __all__ = ["router"]
