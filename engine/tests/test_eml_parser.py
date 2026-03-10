@@ -7,6 +7,7 @@ parser and the studio UI.
 """
 
 import io
+import os
 import pytest
 from webapp.services.eml_parser import parse_eml, export_eml
 
@@ -15,61 +16,11 @@ from webapp.services.eml_parser import parse_eml, export_eml
 # Fixtures
 # ---------------------------------------------------------------------------
 
-# Minimal valid EML 2.2.0 document with:
-#   - 1 dataset-level element
-#   - 1 dataTable entity (id="24632bb8dbdace8be4693baf5c9e4b97")
-#   - 2 attributes (first has id + existing annotation, second has id, no annotation)
-#   - 1 geographicCoverage (id="geo-1"), no existing annotation
-# Mirrors the structure of studio/src/constants/mockData.ts :: EXAMPLE_EML_XML
-EXAMPLE_EML_XML = """\
-<?xml version="1.0" encoding="UTF-8"?>
-<eml:eml xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="https://eml.ecoinformatics.org/eml-2.2.0 https://eml.ecoinformatics.org/eml-2.2.0/eml.xsd"
-  packageId="cos-spu.10.1"
-  system="https://pasta.edirepository.org">
-  <dataset>
-    <title>City of Seattle Amphibian Egg Mass Counts</title>
-    <abstract>
-      <para>Survey data for amphibian egg masses in Cedar River Municipal Watershed.</para>
-    </abstract>
-    <coverage>
-      <geographicCoverage id="geo-1">
-        <geographicDescription>
-          A series of small lakes within the Cedar River Municipal Watershed.
-        </geographicDescription>
-        <boundingCoordinates>
-          <westBoundingCoordinate>-121.894046</westBoundingCoordinate>
-          <eastBoundingCoordinate>-121.884546</eastBoundingCoordinate>
-          <northBoundingCoordinate>47.3991</northBoundingCoordinate>
-          <southBoundingCoordinate>47.396387</southBoundingCoordinate>
-        </boundingCoordinates>
-      </geographicCoverage>
-    </coverage>
-    <dataTable id="24632bb8dbdace8be4693baf5c9e4b97" scope="document">
-      <entityName>SurveyResults</entityName>
-      <entityDescription>Table with survey information and egg mass counts.</entityDescription>
-      <physical>
-        <objectName>SurveyResults.csv</objectName>
-      </physical>
-      <attributeList>
-        <attribute id="d49be2c0-7b9e-41f4-ae07-387d3e1f14c8">
-          <attributeName>Latitude</attributeName>
-          <attributeDefinition>Latitude of collection</attributeDefinition>
-          <annotation>
-            <propertyURI label="has unit">http://qudt.org/schema/qudt/hasUnit</propertyURI>
-            <valueURI label="Degree">http://qudt.org/vocab/unit/DEG</valueURI>
-          </annotation>
-        </attribute>
-        <attribute id="d2569832-42ec-4532-b333-bf68e84598da">
-          <attributeName>Longitude</attributeName>
-          <attributeDefinition>Longitude of collection</attributeDefinition>
-        </attribute>
-      </attributeList>
-    </dataTable>
-  </dataset>
-</eml:eml>
-"""
+FIXTURES_DIR = os.path.join(os.path.dirname(__file__), "fixtures")
+
+# The full EML 2.2.0 document from the Studio's mockData.ts
+with open(os.path.join(FIXTURES_DIR, "example_eml.xml"), "r", encoding="utf-8") as f:
+    EXAMPLE_EML_XML = f.read()
 
 EML_21_XML = """\
 <?xml version="1.0" encoding="UTF-8"?>
@@ -120,8 +71,8 @@ class TestParseEmlExtraction:
         return parse_eml(EXAMPLE_EML_XML)
 
     def test_element_count(self, elements):
-        """Fixture EML yields: 1 DATASET + 1 DATATABLE + 2 ATTRIBUTE + 1 COVERAGE = 5."""
-        assert len(elements) == 5
+        """Full fixture EML yields: 1 Dataset + 2 DataTables + 1 OtherEntity + 35 Attributes + 1 GeoCoverage = 40 elements."""
+        assert len(elements) == 40
 
     def test_dataset_element_present(self, elements):
         """Dataset-level element has id='dataset-top-level' and type='DATASET'."""
@@ -133,7 +84,7 @@ class TestParseEmlExtraction:
 
     def test_entity_element_uses_xml_id(self, elements):
         """dataTable entity preserves its XML id= attribute."""
-        entity = next((e for e in elements if e["type"] == "DATATABLE"), None)
+        entity = next((e for e in elements if e["type"] == "DATATABLE" and e["name"] == "SurveyResults"), None)
         assert entity is not None
         assert entity["id"] == "24632bb8dbdace8be4693baf5c9e4b97"
         assert entity["name"] == "SurveyResults"
@@ -173,17 +124,13 @@ class TestParseEmlExtraction:
 
     def test_attribute_no_annotation_pending(self, elements):
         """Attribute without existing annotations has status=PENDING."""
-        lon = next(
-            (
-                e
-                for e in elements
-                if e["type"] == "ATTRIBUTE" and e["name"] == "Longitude"
-            ),
+        target = next(
+            (e for e in elements if e["type"] == "ATTRIBUTE" and e["name"] == "SurveyID"),
             None,
         )
-        assert lon is not None
-        assert lon["status"] == "PENDING"
-        assert lon["currentAnnotations"] == []
+        assert target is not None
+        assert target["status"] == "PENDING"
+        assert target["currentAnnotations"] == []
 
     def test_geo_coverage_uses_xml_id(self, elements):
         """Geographic coverage element with XML id="geo-1" retains that id."""
@@ -268,31 +215,29 @@ class TestParseEmlFallbackId:
 class TestExportEml:
     def test_roundtrip_adds_attribute_annotation(self):
         """
-        Parse → approve an annotation on Longitude → export → re-parse.
-        The Longitude attribute must now carry the annotation in the output XML.
+        Parse → approve an annotation on SurveyID → export → re-parse.
+        The SurveyID attribute must now carry the annotation in the output XML.
         """
         elements = parse_eml(EXAMPLE_EML_XML)
-        lon = next(e for e in elements if e["name"] == "Longitude")
-        lon["currentAnnotations"] = [
-            {
-                "label": "Degree",
-                "uri": "http://qudt.org/vocab/unit/DEG",
-                "ontology": "QUDT",
-                "confidence": 1.0,
-                "propertyLabel": "has unit",
-                "propertyUri": "http://qudt.org/schema/qudt/hasUnit",
-            }
-        ]
+        target = next(e for e in elements if e["name"] == "SurveyID")
+        target["currentAnnotations"] = [{
+            "label": "Identifier",
+            "uri": "http://purl.obolibrary.org/obo/IAO_0000578",
+            "ontology": "IAO",
+            "confidence": 1.0,
+            "propertyLabel": "has unit",
+            "propertyUri": "http://qudt.org/schema/qudt/hasUnit",
+        }]
 
         updated_xml = export_eml(EXAMPLE_EML_XML, elements)
         assert "<annotation>" in updated_xml
-        assert "http://qudt.org/vocab/unit/DEG" in updated_xml
+        assert "http://purl.obolibrary.org/obo/IAO_0000578" in updated_xml
 
-        # Re-parse: Longitude should now have 1 annotation
+        # Re-parse: SurveyID should now have 1 annotation
         re_elements = parse_eml(updated_xml)
-        lon_re = next(e for e in re_elements if e["name"] == "Longitude")
-        assert len(lon_re["currentAnnotations"]) == 1
-        assert lon_re["currentAnnotations"][0]["label"] == "Degree"
+        target_re = next(e for e in re_elements if e["name"] == "SurveyID")
+        assert len(target_re["currentAnnotations"]) == 1
+        assert target_re["currentAnnotations"][0]["label"] == "Identifier"
 
     def test_roundtrip_adds_geo_annotation_detached(self):
         """
@@ -359,12 +304,13 @@ class TestDocumentTargetsEndpoint:
         assert response.status_code == 200
         data = response.json()
         assert isinstance(data, list)
-        assert len(data) == 5
+        assert len(data) == 40
         types = {el["type"] for el in data}
         assert "DATASET" in types
         assert "DATATABLE" in types
         assert "ATTRIBUTE" in types
         assert "COVERAGE" in types
+        assert "OTHERENTITY" in types
 
     def test_eml_21_returns_422(self, client):
         """POST /api/documents/targets with EML 2.1 returns 422."""
@@ -396,17 +342,15 @@ class TestDocumentExportEndpoint:
     def test_export_roundtrip_returns_xml(self, client):
         """POST /api/documents/export returns XML with approved annotation injected."""
         elements = parse_eml(EXAMPLE_EML_XML)
-        lon = next(e for e in elements if e["name"] == "Longitude")
-        lon["currentAnnotations"] = [
-            {
-                "label": "Degree",
-                "uri": "http://qudt.org/vocab/unit/DEG",
-                "ontology": "QUDT",
-                "confidence": 1.0,
-                "propertyLabel": "has unit",
-                "propertyUri": "http://qudt.org/schema/qudt/hasUnit",
-            }
-        ]
+        target = next(e for e in elements if e["name"] == "SurveyID")
+        target["currentAnnotations"] = [{
+            "label": "Identifier",
+            "uri": "http://purl.obolibrary.org/obo/IAO_0000578",
+            "ontology": "IAO",
+            "confidence": 1.0,
+            "propertyLabel": "has unit",
+            "propertyUri": "http://qudt.org/schema/qudt/hasUnit",
+        }]
 
         payload = {
             "eml_xml": EXAMPLE_EML_XML,
@@ -416,7 +360,7 @@ class TestDocumentExportEndpoint:
         assert response.status_code == 200
         assert "application/xml" in response.headers["content-type"]
         body = response.text
-        assert "http://qudt.org/vocab/unit/DEG" in body
+        assert "http://purl.obolibrary.org/obo/IAO_0000578" in body
         assert "<annotation>" in body
 
     def test_export_with_malformed_xml_returns_422(self, client):
