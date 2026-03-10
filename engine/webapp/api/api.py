@@ -17,8 +17,9 @@ from webapp.services.core import (
     recommend_for_geographic_coverage,
 )
 from webapp.services.eml_parser import parse_eml, export_eml
+from webapp.services.audit import generate_audit_report
 from webapp.models.log_selection import LogSelection
-from webapp.models.document_request import ExportRequest
+from webapp.models.document_request import ExportRequest, AuditRequest
 
 daiquiri.setup()
 logger = daiquiri.getLogger(__name__)
@@ -169,6 +170,30 @@ def export_document(request: ExportRequest) -> Response:
         logger.exception("export_document unexpected error: %s", e)
         raise HTTPException(
             status_code=500, detail="Internal server error exporting EML document."
+        ) from e
+
+
+@router.post("/api/documents/audit")
+def export_audit(request: AuditRequest) -> Response:
+    """
+    Accepts an AuditRequest and returns a JSONL audit report of the decisions.
+
+    :param request: AuditRequest containing elements and provenance
+    :return: JSONL plain-text string
+    :raises HTTPException: 500 on generation errors
+    """
+    try:
+        report = generate_audit_report(request.elements, request.provenance)
+        logger.info(
+            "export_audit: generated audit report for %d elements.",
+            len(request.elements),
+        )
+        # using application/x-ndjson as standard for JSONL
+        return Response(content=report, media_type="application/x-ndjson")
+    except Exception as e:
+        logger.exception("export_audit unexpected error: %s", e)
+        raise HTTPException(
+            status_code=500, detail="Internal server error generating audit report."
         ) from e
 
 
