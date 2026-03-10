@@ -9,7 +9,7 @@ dependencies = [
     "httpx>=0.28",
     "requests>=2.32",
     "daiquiri>=3.0",
-    "lxml>=5.0",
+    "lxml>=6.0",
 ]
 
 [project.optional-dependencies]
@@ -30,7 +30,7 @@ pydantic = ">=2.12"
 httpx = ">=0.28"
 requests = ">=2.32"
 daiquiri = ">=3.0"
-lxml = ">=5.0"
+lxml = ">=6.0"
 
 [tool.pixi.tasks]
 serve = "uvicorn webapp.run:app --reload"
