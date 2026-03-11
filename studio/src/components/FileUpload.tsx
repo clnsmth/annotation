@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { UploadCloud, FileCode, PlayCircle, Sparkles, AlertCircle } from 'lucide-react';
 
 interface FileUploadProps {
-  onFileLoaded: (name: string, content: string, skipRecommendations: boolean) => void;
+  onFileLoaded: (name: string, content: string, skipRecommendations: boolean, file?: File) => void;
   onLoadExample: (skipRecommendations: boolean) => void;
   error?: string | null;
 }
@@ -20,7 +20,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileLoaded, onLoadExam
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      onFileLoaded(file.name, content, skipRecommendations);
+      onFileLoaded(file.name, content, skipRecommendations, file);
     };
     reader.readAsText(file);
   };
