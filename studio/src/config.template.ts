@@ -13,6 +13,7 @@ export const config = {
         endpoints: {
             recommendations: '/api/recommendations',
             targets: '/api/documents/targets',
+            export: '/api/documents/export',
         }
     },
 

@@ -14,7 +14,8 @@ vi.mock('../src/services/recommenderService', () => ({
 vi.mock('../src/services/documentService', () => ({
     documentService: {
         getTargets: vi.fn().mockResolvedValue([]),
-        getTargetsFromString: vi.fn().mockResolvedValue([])
+        getTargetsFromString: vi.fn().mockResolvedValue([]),
+        exportDocument: vi.fn().mockResolvedValue('<eml:eml></eml:eml>')
     }
 }));
 
