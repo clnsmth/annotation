@@ -12,9 +12,13 @@ export const config = {
 
         endpoints: {
             recommendations: '/api/recommendations',
-            // Add other API endpoints here as needed...
+            targets: '/api/documents/targets',
         }
     },
+
+    features: {
+        useBackendParser: import.meta.env.VITE_USE_BACKEND_PARSER !== 'false', // Default to true unless explicitly disabled
+    }
 
     // You can also add other configurations here, such as:
     // features: {

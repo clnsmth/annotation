@@ -3,7 +3,9 @@ import { Layout } from './components/Layout';
 import { FileUpload } from './components/FileUpload';
 import { AnnotationEditor } from './components/AnnotationEditor';
 import { emlParser } from './services/emlParser';
+import { documentService } from './services/documentService';
 import { recommenderService } from './services/recommenderService';
+import { config } from './config';
 import { AnnotatableElement, OntologyTerm } from './types';
 import { Loader2, Download, CheckCircle, RotateCcw, AlertTriangle } from 'lucide-react';
 import { EXAMPLE_EML_XML } from './constants/mockData';
@@ -37,7 +39,7 @@ export default function App() {
   };
 
   // Handle File Upload and Initial Processing
-  const handleFileLoaded = async (name: string, content: string, skipRecommendations: boolean) => {
+  const handleFileLoaded = async (name: string, content: string, skipRecommendations: boolean, file?: File) => {
     console.log(`File loaded: ${name}. AI Recommendations enabled: ${!skipRecommendations}`);
 
     setFileName(name);
@@ -51,7 +53,20 @@ export default function App() {
     try {
       // Simulate small delay for UX
       await new Promise(r => setTimeout(r, 500));
-      const parsedElements = emlParser.parse(content);
+      let parsedElements: AnnotatableElement[];
+
+      if (config.features.useBackendParser) {
+        console.log('Using new backend API for parsing via config toggle.');
+        if (file) {
+           parsedElements = await documentService.getTargets(file);
+        } else {
+           // Fallback for example data if file wasn't provided directly
+           parsedElements = await documentService.getTargetsFromString(content, name);
+        }
+      } else {
+        console.log('Using legacy local browser parser via config toggle.');
+        parsedElements = emlParser.parse(content);
+      }
       setElements(parsedElements);
 
       let recommendationsMap: Map<string, OntologyTerm[]> = new Map();

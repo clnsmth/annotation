@@ -78,7 +78,7 @@ describe('FileUpload component', () => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         expect(handleFileLoaded).toHaveBeenCalledTimes(1);
-        expect(handleFileLoaded).toHaveBeenCalledWith('test.xml', '<eml><dataset></dataset></eml>', true); // AI off by default
+        expect(handleFileLoaded).toHaveBeenCalledWith('test.xml', '<eml><dataset></dataset></eml>', true, file); // AI off by default
     });
 
     it('handles drag and drop file upload securely', async () => {
@@ -99,6 +99,6 @@ describe('FileUpload component', () => {
         await new Promise(resolve => setTimeout(resolve, 50));
 
         expect(handleFileLoaded).toHaveBeenCalledTimes(1);
-        expect(handleFileLoaded).toHaveBeenCalledWith('dropped.xml', '<eml><dataset></dataset></eml>', true);
+        expect(handleFileLoaded).toHaveBeenCalledWith('dropped.xml', '<eml><dataset></dataset></eml>', true, file);
     });
 });
