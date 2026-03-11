@@ -52,6 +52,50 @@ export class DocumentService {
     const file = new File([blob], filename, { type: 'text/xml' });
     return this.getTargets(file);
   }
+
+  /**
+   * Export an EML document from the backend with the applied annotations.
+   * 
+   * @param emlXml - The raw EML string
+   * @param elements - The list of annotatable elements containing user decisions
+   */
+  async exportDocument(emlXml: string, elements: AnnotatableElement[]): Promise<string> {
+    const url = getApiUrl('export');
+    console.log(`[DocumentService] Requesting exported EML from backend: ${url}`);
+
+    const payload = {
+      eml_xml: emlXml,
+      elements: elements
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        let errorMessage = response.statusText;
+        try {
+          const errData = await response.json();
+          if (errData && errData.detail) errorMessage = errData.detail;
+        } catch (e) {
+          // Ignore JSON parse error on generic error payloads
+        }
+        throw new Error(`Backend Error ${response.status}: ${errorMessage}`);
+      }
+
+      const xmlText = await response.text();
+      console.log(`[DocumentService] Successfully exported EML document.`);
+      return xmlText;
+    } catch (error) {
+      console.error('[DocumentService] Failed to export document.', error);
+      throw error;
+    }
+  }
 }
 
 export const documentService = new DocumentService();
