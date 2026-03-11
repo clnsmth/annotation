@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-
+import mockTargets from './mock-targets.json' assert { type: 'json' };
 test.describe('Annotation Studio Visual Regression', () => {
     test('verifies UI components match baseline snapshots', async ({ page }) => {
         // 1. Landing Screen (Upload)
@@ -8,6 +8,11 @@ test.describe('Annotation Studio Visual Regression', () => {
         await expect(page).toHaveScreenshot('landing-screen.png', { fullPage: true });
 
         // 2. Editor Screen (with example data)
+        // Mock targets endpoint since backend is not running
+        await page.route('http://localhost:8000/api/documents/targets', async route => {
+            await route.fulfill({ json: mockTargets });
+        });
+
         await page.getByRole('button', { name: 'Load Example Data' }).click();
         await expect(page.getByRole('button', { name: 'Review & Export' })).toBeVisible({ timeout: 10000 });
 
