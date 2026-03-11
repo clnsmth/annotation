@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-
+import mockTargets from './mock-targets.json' assert { type: 'json' };
 test.describe('Annotation Studio End-to-End', () => {
     test('completes the full annotation flow', async ({ page }) => {
         // 1. Navigate to the App
@@ -9,6 +9,11 @@ test.describe('Annotation Studio End-to-End', () => {
         await expect(page.locator('text=Upload EML Metadata')).toBeVisible();
 
         // 3. Toggle AI Recommendations On
+        // Mock targets endpoint since backend is not running
+        await page.route('http://localhost:8000/api/documents/targets', async route => {
+            await route.fulfill({ json: mockTargets });
+        });
+
         // First, mock the backend response since we aren't running the fastAPI engine in E2E
         await page.route('http://localhost:8000/api/recommendations', async route => {
             const json = [
