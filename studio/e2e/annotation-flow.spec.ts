@@ -14,6 +14,11 @@ test.describe('Annotation Studio End-to-End', () => {
             await route.fulfill({ json: mockTargets });
         });
 
+        // Mock export endpoint
+        await page.route('http://localhost:8000/api/documents/export', async route => {
+            await route.fulfill({ body: '<eml:eml><dataset><title>Export Mock</title></dataset></eml:eml>' });
+        });
+
         // First, mock the backend response since we aren't running the fastAPI engine in E2E
         await page.route('http://localhost:8000/api/recommendations', async route => {
             const json = [
