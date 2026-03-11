@@ -1,0 +1,621 @@
+[
+  {
+    "id": "dataset-top-level",
+    "path": "dataset",
+    "context": "Dataset Level",
+    "contextDescription": "Annotations that apply to the entire dataset",
+    "objectName": null,
+    "name": "City of Seattle, Seattle Public Utilities, Amphibian Egg Mass Counts 2002 - Current,\n      Cedar River Municipal Watershed, King County, WA",
+    "description": "This data package contains survey data beginning in 2002 for amphibian egg masses in\n        five small kettle lakes (known as \"14 Lakes\") in the Cedar River Municipal Watershed,\n        located in King County, Washington, USA. These surveys are conducted annually and are\n        intended to be continued. The lakes range in size from 0.8 to 4.3 acres, have no perennial\n        inlet or outlet, and were formed through glacial outwash deposits. The lakes are located at\n        an elevation of 800 feet and are well suited for pond breeding amphibians because the lakes\n        have no fish. Surveys were conducted annually, typically during the last week of March or\n        first week of April, to coincide with amphibian breeding seasons. Surveyors walked, waded,\n        or paddled the perimeter of each of the lakes during a survey, and tallied the number and\n        type of egg masses that were encountered. Red legged frogs (Rana aurora) were of specific\n        interest for the surveys, though egg masses of other species were noted during some survey\n        years. The lakes represent the largest known breeding concentration of red legged frogs in\n        the municipal watershed. The water depth of the lakes fluctuates year-to-year, which\n        affected the feasibility of surveys. Lower water levels correspond to easier survey\n        conditions: steep slopes and thick vegetation make surveying challenging when the water is\n        high. Surveys were periodically cancelled during years where high water made surveying\n        difficult or during staffing shortages. Counts of red legged frog egg masses across all\n        lakes ranged between 24 and 1778 in a given year.",
+    "type": "DATASET",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "24632bb8dbdace8be4693baf5c9e4b97",
+    "path": "dataset/dataTable[0]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "SurveyResults",
+    "description": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "type": "DATATABLE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "cfe0601b-e76b-4f34-8a5a-655db3b0491c",
+    "path": "dataset/dataTable[0]/attributeList/attribute[0]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "SurveyID",
+    "description": "Unique ID based on date and lake surveyed",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "d49be2c0-7b9e-41f4-ae07-387d3e1f14c8",
+    "path": "dataset/dataTable[0]/attributeList/attribute[1]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Latitude",
+    "description": "Latitude of collection",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Degree",
+        "uri": "http://qudt.org/vocab/unit/DEG",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "d2569832-42ec-4532-b333-bf68e84598da",
+    "path": "dataset/dataTable[0]/attributeList/attribute[2]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Longitude",
+    "description": "longitude of collection",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Degree",
+        "uri": "http://qudt.org/vocab/unit/DEG",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "81506c28-3ae9-473a-8426-70117c4a84ac",
+    "path": "dataset/dataTable[0]/attributeList/attribute[3]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Accuracy_m",
+    "description": "GPS positional accuracy in meters, as reported by iphone data collection app",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Meter",
+        "uri": "http://qudt.org/vocab/unit/M",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "6778d3cd-77e3-4b7b-9844-31248310479d",
+    "path": "dataset/dataTable[0]/attributeList/attribute[4]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Date",
+    "description": "sampling date. If the sampling date is March 1st of any given year, this is a placeholder date for a survey year where no survey date was recorded.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "6464d56e-8a40-4962-ae4c-1cbc7795250e",
+    "path": "dataset/dataTable[0]/attributeList/attribute[5]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "StartTime",
+    "description": "Start time of survey in Pacific Time (America/LosAngeles), with appropriate daylight savings adjustment, if applicable",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "be22b649-5e4e-43bd-ad37-1965f3d23bdc",
+    "path": "dataset/dataTable[0]/attributeList/attribute[6]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "EndTime",
+    "description": "End time of survey in Pacific Time (America/LosAngeles), with appropriate daylight savings adjustment, if applicable",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "3132391c-2f62-4aac-a208-549c2cbff735",
+    "path": "dataset/dataTable[0]/attributeList/attribute[7]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "SurveyLength",
+    "description": "Total time spent on survey (HH:MM)",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "e58a1ac7-066f-45f9-a4b8-9b596c60eb07",
+    "path": "dataset/dataTable[0]/attributeList/attribute[8]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "SurveyLengthCalc",
+    "description": "Total time spent on survey (HH:MM), estimated when end time was not recorded, based off of the last observation time during that survey.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "f31e76c5-3359-4b21-af25-9e09634ab47f",
+    "path": "dataset/dataTable[0]/attributeList/attribute[9]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "latest_observation_time",
+    "description": "The final egg mass detection time in a survey-used for SurveyLengthCalc.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "66c5e93d-7a8b-4dbf-989f-9294db3ec7b9",
+    "path": "dataset/dataTable[0]/attributeList/attribute[10]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Lake",
+    "description": "Lake surveyed. Big Lake and Deep Lake form one continuous waterbody during high water years, and from 2021 to 2022 it was surveyed as one lake as opposed to breaking the lake up into two surveys. See map jpg for lake name labels.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "398be849-a3d4-4c61-9013-ae41cb6d6d59",
+    "path": "dataset/dataTable[0]/attributeList/attribute[11]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Observer",
+    "description": "Last name, or first and last name, of surveyor(s)",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "88da6649-63cf-4b6f-a3c8-6a37a6155833",
+    "path": "dataset/dataTable[0]/attributeList/attribute[12]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Sky",
+    "description": "Cloud cover characteristics at the start of the survey. Egg masses are easier to see in clear and sunny conditions compared to overcast and cloudy conditions.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "56fb8aad-a34a-4ebb-9175-bf80b2f6840f",
+    "path": "dataset/dataTable[0]/attributeList/attribute[13]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Precip",
+    "description": "Precipitation at the survey start. Rain disturbs the water surface and makes egg masses difficult to see.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "3357918a-e3b9-4829-97cc-f44b1aa6b51e",
+    "path": "dataset/dataTable[0]/attributeList/attribute[14]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Wind",
+    "description": "General description of wind at start of survey. Wind disturbs the water surface and makes egg masses harder to see.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "71c4f9e8-5448-4d5b-859a-1b6b6bc2dd46",
+    "path": "dataset/dataTable[0]/attributeList/attribute[15]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "AirThermometer",
+    "description": "Check if a thermometer was used to measure air temperature in the field.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "0673eb41-1b47-4d32-9d87-bf10e17c69b6",
+    "path": "dataset/dataTable[0]/attributeList/attribute[16]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "AirTemperature_F",
+    "description": "Air temperature measured at the start of the survey (if airthermometer=Yes), or from cell phone weather app",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Degree Fahrenheit",
+        "uri": "http://qudt.org/vocab/unit/DEG_F",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "0ade98ad-add4-4ce5-afcb-6c703b12cf1e",
+    "path": "dataset/dataTable[0]/attributeList/attribute[17]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "WaterThermometer",
+    "description": "Check if a thermometer was used to measure water temperature in the field.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "dca8c4a4-472b-4998-bf35-82b9e4fb8f22",
+    "path": "dataset/dataTable[0]/attributeList/attribute[18]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "WaterTemperature_F",
+    "description": "Water temperature measured at the start of the survey at 6 inch depth, in the shade if possible.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Degree Fahrenheit",
+        "uri": "http://qudt.org/vocab/unit/DEG_F",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "7713a0b2-d5b2-4378-8d6d-6c74baae6971",
+    "path": "dataset/dataTable[0]/attributeList/attribute[19]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "WaterColor",
+    "description": "Color of the lake water (clear, or stained from tannins). Egg masses slightly harder to discern in stained water.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "62090101-5cc1-463c-a63d-843616d148cb",
+    "path": "dataset/dataTable[0]/attributeList/attribute[20]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "SurveyType",
+    "description": "Conveyance method for the survey.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "0c944fd1-915e-40fb-82f1-b2da8a5da74e",
+    "path": "dataset/dataTable[0]/attributeList/attribute[21]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Comments",
+    "description": "Freeform comments about the survey",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "24b4badd-56b7-4dbf-8848-f6531f20c024",
+    "path": "dataset/dataTable[0]/attributeList/attribute[22]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "SpeciesCode",
+    "description": "Species code identifier for the NumberOf... columns",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "60ffc8a2-c42f-40ab-89fa-db294f256e50",
+    "path": "dataset/dataTable[0]/attributeList/attribute[23]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "NumberOfEggMasses",
+    "description": "Number of egg masses counted per species during a survey",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Number",
+        "uri": "http://qudt.org/vocab/unit/NUM",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "6630e2e6-ed6e-4d50-8fdb-b9eff7e905cf",
+    "path": "dataset/dataTable[0]/attributeList/attribute[24]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "NumberOfAdults",
+    "description": "Number of adults counted per species during a survey",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Number",
+        "uri": "http://qudt.org/vocab/unit/NUM",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "4403ca82-f7e0-48c8-8cef-ca07017f4d2b",
+    "path": "dataset/dataTable[0]/attributeList/attribute[25]",
+    "context": "SurveyResults",
+    "contextDescription": "Table contains survey information and the counts of the number of egg masses for each species during that survey.",
+    "objectName": "SurveyResults.csv",
+    "name": "Weather",
+    "description": "longform description of weather conditions",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "9f81741eef929975361d53fe07d370b9",
+    "path": "dataset/dataTable[1]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "EggMasses",
+    "description": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "type": "DATATABLE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "8a90023e-72cc-4540-a4b2-d4532ea86c38",
+    "path": "dataset/dataTable[1]/attributeList/attribute[0]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "SurveyID",
+    "description": "Unique ID based on date and lake surveyed",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "c36d17e7-89b2-4722-b586-49d9934a398e",
+    "path": "dataset/dataTable[1]/attributeList/attribute[1]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "DateTime",
+    "description": "Date and time of observation of egg mass(es). America/LosAngeles time zone.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "2a325933-956f-485f-b0be-2817f7b7462c",
+    "path": "dataset/dataTable[1]/attributeList/attribute[2]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "Latitude",
+    "description": "Latitude of observation (WGS84)",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Degree",
+        "uri": "http://qudt.org/vocab/unit/DEG",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "d9a40fb9-4210-4527-9f4f-219c3583ef1c",
+    "path": "dataset/dataTable[1]/attributeList/attribute[3]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "Longitude",
+    "description": "Longitude of observation (WGS84",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Degree",
+        "uri": "http://qudt.org/vocab/unit/DEG",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "1e536558-938d-45a8-b83d-5d178cfd7d18",
+    "path": "dataset/dataTable[1]/attributeList/attribute[4]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "Accuracy_m",
+    "description": "Estimated GPS precision",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Meter",
+        "uri": "http://qudt.org/vocab/unit/M",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "85b6fa31-21ce-4e3a-a8f7-404c669a9cc7",
+    "path": "dataset/dataTable[1]/attributeList/attribute[5]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "NumberOfEggMasses",
+    "description": "The number of egg masses counted in a given observation. Nearby egg masses of the same species and on the same substrate were grouped together in one observation to speed data entry. Those egg masses were often within a couple meters of each other.",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [
+      {
+        "label": "Number",
+        "uri": "http://qudt.org/vocab/unit/NUM",
+        "ontology": "QUDT",
+        "confidence": 1.0,
+        "propertyLabel": "has unit",
+        "propertyUri": "http://qudt.org/schema/qudt/hasUnit"
+      }
+    ],
+    "recommendedAnnotations": [],
+    "status": "APPROVED"
+  },
+  {
+    "id": "f838b7b8-2468-47bd-9717-56ea091e4780",
+    "path": "dataset/dataTable[1]/attributeList/attribute[6]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "SpeciesCode",
+    "description": "Amphibian species of the egg mass observation",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "3220828d-a9a3-4c98-89a6-36f4a740a57e",
+    "path": "dataset/dataTable[1]/attributeList/attribute[7]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "EggMassSubstrate",
+    "description": "What the egg mass was attached to",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "8854db34-3d6e-481a-81d4-a73a6b3eb8b1",
+    "path": "dataset/dataTable[1]/attributeList/attribute[8]",
+    "context": "EggMasses",
+    "contextDescription": "Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.",
+    "objectName": "EggMasses.csv",
+    "name": "Comments",
+    "description": "comments about the observation",
+    "type": "ATTRIBUTE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "befe3d845aea4510048251bd0079e3de",
+    "path": "dataset/otherEntity[0]",
+    "context": "14LakesRiparianHabitatRestorationProjectAsBuilt2012",
+    "contextDescription": "14 Lakes Riparian Habitat Restoration Project As-Built Document referenced in SurveyReport_2003_2014 amphibian monitoring survey report. Provided for greater context regarding habitat management in the project location.",
+    "objectName": "14LakesRiparianHabitatRestorationProjectAsBuilt2012.pdf",
+    "name": "14LakesRiparianHabitatRestorationProjectAsBuilt2012",
+    "description": "14 Lakes Riparian Habitat Restoration Project As-Built Document referenced in SurveyReport_2003_2014 amphibian monitoring survey report. Provided for greater context regarding habitat management in the project location.",
+    "type": "OTHERENTITY",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  },
+  {
+    "id": "geo-1",
+    "path": "dataset/coverage/geographicCoverage[0]",
+    "context": "Geographic Coverage",
+    "contextDescription": null,
+    "objectName": null,
+    "name": "Location",
+    "description": "A series of small lakes within the Cedar River Municipal Watershed in the Puget Sound region of western Washington State, USA",
+    "type": "COVERAGE",
+    "currentAnnotations": [],
+    "recommendedAnnotations": [],
+    "status": "PENDING"
+  }
+]
