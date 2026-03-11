@@ -10,8 +10,13 @@ vi.mock('../src/services/recommenderService', () => ({
         getRecommendations: vi.fn().mockResolvedValue(new Map())
     }
 }));
-
-import { emlParser } from '../src/services/emlParser';
+// Mock the documentserivce to prevent network parsing requests
+vi.mock('../src/services/documentService', () => ({
+    documentService: {
+        getTargets: vi.fn().mockResolvedValue([]),
+        getTargetsFromString: vi.fn().mockResolvedValue([])
+    }
+}));
 
 describe('App Integration', () => {
     beforeEach(() => {
@@ -80,17 +85,14 @@ describe('App Integration', () => {
         const user = userEvent.setup();
         render(<App />);
 
-        // Mock the parser to throw an error
-        const parseSpy = vi.spyOn(emlParser, 'parse').mockImplementation(() => {
-            throw new Error('EML version 2.1 detected. This application only supports EML 2.2.0 or later.');
+        // We'll mock documentService.getTargets instead of emlParser (since test is running with backend parsing ON by default)
+        const parseSpy = vi.spyOn(await import('../src/services/documentService').then(m => m.documentService), 'getTargets').mockImplementation(() => {
+            return Promise.reject(new Error('Backend Error 422: EML version 2.1 detected.'));
         });
 
         // Suppress the console.error from the component to keep test output clean
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 
-        // Test relies on the FileUpload component hidden input
-        // Using screen.getByTestId if we added it, but let's query the input type=file directly
-        // React Testing library gets the hidden input associated with the dropzone
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         expect(fileInput).not.toBeNull();
 
