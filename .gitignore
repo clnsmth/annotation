@@ -216,6 +216,9 @@ __marimo__/
 **/config.py
 /studio/src/config.ts
 
+# Engine Data
+engine/proposals.jsonl
+
 # ---------------------------------------------------------------------------
 # Node.js / Vite / Studio specific
 # ---------------------------------------------------------------------------
