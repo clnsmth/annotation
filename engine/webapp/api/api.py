@@ -51,8 +51,16 @@ async def submit_proposal(
     :raises HTTPException: If an error occurs during processing
     """
     try:
+        # 1. Log to persistent mock database (file)
+        # ADR 0001 specifies no external DB right now; we use a .jsonl stub
+        # so that proposal records are safely preserved regardless of email failure.
+        with open("proposals.jsonl", "a", encoding="utf-8") as f:
+            f.write(proposal.model_dump_json() + "\n")
+
+        # 2. Queue email dispatch
         background_tasks.add_task(send_email_notification, proposal)
-        logger.info("Proposal received and email notification queued.")
+
+        logger.info("Proposal logged to disk and email notification queued.")
         return {"status": "success", "message": "Proposal received and processing."}
     except Exception as e:
         logger.exception("Error processing proposal: %s", e)

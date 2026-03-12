@@ -53,7 +53,9 @@ def test_recommend_for_geographic_coverage_unit(
     Unit test for recommend_for_geographic_coverage.
     Checks that the output matches the mock_geo_coverage fixture.
     """
-    geos = [{"description": "Lake Tahoe region", "objectName": "LakeTahoe"}]
+    geos = [
+        {"id": "geo-1", "description": "Lake Tahoe region", "objectName": "LakeTahoe"}
+    ]
     results = recommend_for_geographic_coverage(geos, request_id="test-uuid-5678")
     assert isinstance(results, list)
     for item in results:
