@@ -155,10 +155,18 @@ def recommend_for_geographic_coverage(
     """
     # pylint: disable=unused-argument
     if Config.USE_MOCK_RECOMMENDATIONS:
-        results = MOCK_GEOGRAPHICCOVERAGE_RECOMMENDATIONS.copy()
-        # Add request_id to each recommendation in each result
-        for item in results:
-            for rec in item.get("recommendations", []):
-                rec["request_id"] = request_id
+        import copy
+
+        results = []
+        geo_ids = {g.get("id") for g in geos if g.get("id")}
+
+        for mock_item in MOCK_GEOGRAPHICCOVERAGE_RECOMMENDATIONS:
+            if mock_item.get("id") in geo_ids:
+                # Deepcopy to prevent mutating the global mock object
+                item_copy = copy.deepcopy(mock_item)
+                for rec in item_copy.get("recommendations", []):
+                    rec["request_id"] = request_id
+                results.append(item_copy)
+
         return results
     return []
