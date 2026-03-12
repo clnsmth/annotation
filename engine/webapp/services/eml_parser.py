@@ -682,6 +682,7 @@ def export_eml(xml_string: str, elements: list[dict[str, Any]]) -> str:
         if len(annotations_block) == 0 and annotations_block in root:
             root.remove(annotations_block)
 
+    etree.indent(root, space="  ")
     result = etree.tostring(
         root, pretty_print=True, xml_declaration=True, encoding="UTF-8"
     )
