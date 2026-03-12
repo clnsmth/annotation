@@ -70,7 +70,7 @@ As an AI agent, you **MUST STRICTLY ADHERE** to the following **Angular commit s
 
 ### 2. Body (After one blank line)
 - **Content** (Required): You MUST provide a clear overview of the exact changes made AND the motivating rationale behind them (why the changes were necessary).
-- **Constraint**: Wrap all lines in the body at **72 characters**.
+- **Constraint**: Wrap all lines in the body at **< 72 characters**.
 
 ### 3. Footer (After another blank line)
 - **Content** (Optional): List any breaking changes or references to closed issues (e.g., `Closes #123`).
@@ -104,5 +104,5 @@ Before submitting any changes, please ensure you have completed the following:
     - [ ] **NEVER** commit directly to the `main` branch. All changes MUST be committed to a feature branch.
     - [ ] Create a Pull Request (PR) from your feature branch to the `main` branch.
     - [ ] Use the **Angular commit style** for the commit message.
-    - [ ] Ensure the header is under 52 characters and the body is wrapped at 72 characters.
+    - [ ] Ensure the header is under 52 characters and the body is wrapped at < 72 characters.
     - [ ] Include issue references to automatically close related issues.
