@@ -38,3 +38,44 @@ def test_generate_audit_report():
     assert decision_record["element"]["status"] == "APPROVED"
     assert len(decision_record["element"]["currentAnnotations"]) == 1
     assert decision_record["element"]["currentAnnotations"][0]["label"] == "Test Term"
+
+
+def test_generate_audit_report_validates_ids():
+    """Ensure that the audit report correctly segregates and maps object IDs for multiple entities."""
+    element1 = AnnotatableElement(
+        id="dt_123",
+        path="dataset/dataTable[0]",
+        context="DataTable",
+        name="Water Quality",
+        description="A list of measurements",
+        type="DATATABLE",
+        status="APPROVED",
+    )
+    element2 = AnnotatableElement(
+        id="attr_456",
+        path="dataset/dataTable[0]/attributeList/attribute[0]",
+        context="DataTable",
+        name="Temperature",
+        description="Degrees C",
+        type="ATTRIBUTE",
+        status="PENDING",
+    )
+
+    report_str = generate_audit_report(
+        [element1, element2], {"execution_mode": "batch"}
+    )
+    lines = report_str.strip().split("\n")
+    assert len(lines) == 3
+
+    meta = json.loads(lines[0])
+    assert meta["event_type"] == "audit_metadata"
+
+    rec1 = json.loads(lines[1])
+    assert rec1["event_type"] == "element_decision"
+    assert rec1["element"]["id"] == "dt_123"
+    assert rec1["element"]["status"] == "APPROVED"
+
+    rec2 = json.loads(lines[2])
+    assert rec2["event_type"] == "element_decision"
+    assert rec2["element"]["id"] == "attr_456"
+    assert rec2["element"]["status"] == "PENDING"

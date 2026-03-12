@@ -85,12 +85,24 @@ def process_file(file_path: str, output_dir: str, confidence_threshold: float):
         if el.recommendedAnnotations:
             best_rec = max(el.recommendedAnnotations, key=lambda x: x.confidence or 0.0)
             if (best_rec.confidence or 0.0) >= confidence_threshold:
-                el.status = "APPROVED"
-                # If there's an existing annotation we might want to preserve it, but
-                # for algorithmic batch application we assume we just apply the highest confidence one.
-                # The requirements say "check its recommendedAnnotations. Select the one with highest confidence... set currentAnnotations = [selected_term]"
-                el.currentAnnotations = [best_rec]
-                adopted_count += 1
+                # Check for ties
+                tied_recs = [
+                    r
+                    for r in el.recommendedAnnotations
+                    if (r.confidence or 0.0) == (best_rec.confidence or 0.0)
+                ]
+                if len(tied_recs) == 1:
+                    el.status = "APPROVED"
+                    # If there's an existing annotation we might want to preserve it, but
+                    # for algorithmic batch application we assume we just apply the highest confidence one.
+                    el.currentAnnotations = [best_rec]
+                    adopted_count += 1
+                else:
+                    logger.info(
+                        "Tie detected for %s at confidence %f, requires manual review",
+                        el.id,
+                        best_rec.confidence or 0.0,
+                    )
 
     logger.info("Adopted %d recommendations for %s", adopted_count, filename)
 
