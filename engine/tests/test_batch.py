@@ -138,7 +138,7 @@ def test_process_file_handles_equal_confidence(
 ):
     """
     Test that if the top two recommendations have exactly the same confidence
-    score, NO recommendation is auto-adopted (manual review required).
+    score, the first recommendation is auto-adopted automatically without manual review.
     """
     mock_parse_eml.return_value = mock_elements
     mock_recommend_for_attribute.return_value = [
@@ -168,9 +168,10 @@ def test_process_file_handles_equal_confidence(
                 process_file("input_dir/test.xml", "output_dir", 0.8)
 
     element = mock_elements[0]
-    # Because there's a tie, it should remain PENDING
-    assert element.status == "PENDING"
-    assert len(element.currentAnnotations) == 0
+    # In the event of a tie, it should pick the first one matching the highest score
+    assert element.status == "APPROVED"
+    assert len(element.currentAnnotations) == 1
+    assert element.currentAnnotations[0].label == "Term A"
 
 
 @patch("webapp.batch.recommend_for_attribute")
