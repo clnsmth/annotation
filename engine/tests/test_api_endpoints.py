@@ -69,7 +69,9 @@ def test_recommendations_only_geographiccoverage(client: Any) -> None:
     results for geographic coverage only.
     """
     payload = {
-        "GEOGRAPHICCOVERAGE": [{"description": "Arctic region", "objectName": "Arctic"}]
+        "GEOGRAPHICCOVERAGE": [
+            {"id": "geo-1", "description": "Arctic region", "objectName": "Arctic"}
+        ]
     }
     response = client.post("/api/recommendations", json=payload)
     assert response.status_code == 200

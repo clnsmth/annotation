@@ -492,7 +492,6 @@ def export_eml(xml_string: str, elements: list[dict[str, Any]]) -> str:
             annos = dataset_model.get("currentAnnotations", [])
             # Insert before coverage / purpose / maintenance / contact etc.
             ref_candidates = (
-                "coverage",
                 "purpose",
                 "maintenance",
                 "contact",
