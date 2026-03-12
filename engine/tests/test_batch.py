@@ -129,3 +129,86 @@ def test_process_file_ignores_low_confidence(
     element = mock_elements[0]
     assert element.status == "PENDING"
     assert len(element.currentAnnotations) == 0
+
+
+@patch("webapp.batch.recommend_for_attribute")
+@patch("webapp.batch.parse_eml")
+def test_process_file_handles_equal_confidence(
+    mock_parse_eml, mock_recommend_for_attribute, mock_elements, mock_xml_content
+):
+    """
+    Test that if the top two recommendations have exactly the same confidence
+    score, NO recommendation is auto-adopted (manual review required).
+    """
+    mock_parse_eml.return_value = mock_elements
+    mock_recommend_for_attribute.return_value = [
+        {
+            "id": "attr1",
+            "recommendations": [
+                {
+                    "label": "Term A",
+                    "uri": "http://example.com/term/a",
+                    "ontology": "TEST",
+                    "confidence": 0.95,
+                },
+                {
+                    "label": "Term B",
+                    "uri": "http://example.com/term/b",
+                    "ontology": "TEST",
+                    "confidence": 0.95,
+                },
+            ],
+        }
+    ]
+
+    m_open = mock_open(read_data=mock_xml_content)
+    with patch("builtins.open", m_open):
+        with patch("webapp.batch.export_eml"):
+            with patch("webapp.batch.generate_audit_report"):
+                process_file("input_dir/test.xml", "output_dir", 0.8)
+
+    element = mock_elements[0]
+    # Because there's a tie, it should remain PENDING
+    assert element.status == "PENDING"
+    assert len(element.currentAnnotations) == 0
+
+
+@patch("webapp.batch.recommend_for_attribute")
+@patch("webapp.batch.parse_eml")
+def test_process_file_handles_exact_threshold(
+    mock_parse_eml, mock_recommend_for_attribute, mock_elements, mock_xml_content
+):
+    """
+    Test that a recommendation strictly >= the threshold is correctly adopted.
+    """
+    mock_parse_eml.return_value = mock_elements
+    mock_recommend_for_attribute.return_value = [
+        {
+            "id": "attr1",
+            "recommendations": [
+                {
+                    "label": "Boundary Term",
+                    "uri": "http://example.com/term/boundary",
+                    "ontology": "TEST",
+                    "confidence": 0.80,  # Exact match
+                },
+                {
+                    "label": "Low Term",
+                    "uri": "http://example.com/term/low",
+                    "ontology": "TEST",
+                    "confidence": 0.79,
+                },
+            ],
+        }
+    ]
+
+    m_open = mock_open(read_data=mock_xml_content)
+    with patch("builtins.open", m_open):
+        with patch("webapp.batch.export_eml"):
+            with patch("webapp.batch.generate_audit_report"):
+                process_file("input_dir/test.xml", "output_dir", 0.8)
+
+    element = mock_elements[0]
+    assert element.status == "APPROVED"
+    assert len(element.currentAnnotations) == 1
+    assert element.currentAnnotations[0].label == "Boundary Term"
