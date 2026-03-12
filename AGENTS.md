@@ -101,6 +101,8 @@ Before submitting any changes, please ensure you have completed the following:
     - [ ] Update any relevant comments or documentation if the architecture or configuration changes.
     - [ ] Update this `AGENTS.md` file if any environment setup, tools, or best practices change.
 4.  **Submission**:
+    - [ ] **NEVER** commit directly to the `main` branch. All changes MUST be committed to a feature branch.
+    - [ ] Create a Pull Request (PR) from your feature branch to the `main` branch.
     - [ ] Use the **Angular commit style** for the commit message.
     - [ ] Ensure the header is under 52 characters and the body is wrapped at 72 characters.
     - [ ] Include issue references to automatically close related issues.
