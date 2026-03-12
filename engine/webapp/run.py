@@ -7,6 +7,8 @@ Entrypoint for the Semantic EML Annotator Backend.
 - Runs the app with Uvicorn if executed as main
 """
 
+import pathlib
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from webapp.api.api import router
@@ -17,7 +19,16 @@ from webapp.services.core import (
 )
 from webapp.models.proposal_request import ProposalRequest, TermDetails, SubmitterInfo
 
-app: FastAPI = FastAPI(title="Semantic EML Annotator Backend")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize the proposals file if it doesn't exist
+    proposals_file = pathlib.Path("proposals.jsonl")
+    proposals_file.touch(exist_ok=True)
+    yield
+
+
+app: FastAPI = FastAPI(title="Semantic EML Annotator Backend", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
