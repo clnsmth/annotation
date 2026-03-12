@@ -34,6 +34,18 @@ EML_21_XML = """\
 </eml:eml>
 """
 
+EML_20_XML = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="eml://ecoinformatics.org/eml-2.0.1"
+  xsi:schemaLocation="eml://ecoinformatics.org/eml-2.0.1 eml.xsd"
+  packageId="test.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dataset>
+    <title>Very Old EML Dataset</title>
+  </dataset>
+</eml:eml>
+"""
+
 MALFORMED_XML = "<eml:eml><dataset><unclosed>"
 
 
@@ -47,6 +59,11 @@ class TestParseEmlVersionValidation:
         """EML 2.1 documents must be rejected with ValueError."""
         with pytest.raises(ValueError, match="2.1"):
             parse_eml(EML_21_XML)
+
+    def test_rejects_eml_20(self):
+        """EML 2.0 documents must be rejected with ValueError."""
+        with pytest.raises(ValueError, match="2.0"):
+            parse_eml(EML_20_XML)
 
     def test_rejects_malformed_xml(self):
         """Malformed XML must raise ValueError."""
@@ -335,6 +352,21 @@ class TestDocumentTargetsEndpoint:
         )
         assert response.status_code == 422
         assert "2.1" in response.json()["detail"]
+
+    def test_eml_20_returns_422(self, client):
+        """POST /api/documents/targets with EML 2.0.1 returns 422."""
+        response = client.post(
+            "/api/documents/targets",
+            files={
+                "file": (
+                    "v_old.xml",
+                    io.BytesIO(EML_20_XML.encode()),
+                    "application/xml",
+                )
+            },
+        )
+        assert response.status_code == 422
+        assert "2.0" in response.json()["detail"]
 
     def test_malformed_xml_returns_422(self, client):
         """POST /api/documents/targets with malformed XML returns 422."""

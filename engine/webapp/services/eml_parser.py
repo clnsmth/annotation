@@ -15,6 +15,7 @@ ID strategy
 
 import hashlib
 import re
+from dataclasses import dataclass
 from typing import Any, Optional
 
 import daiquiri
@@ -244,9 +245,110 @@ def _validate_eml_version(root: etree._Element) -> None:
 # ---------------------------------------------------------------------------
 
 
+@dataclass
+class EmlEntity:
+    node: etree._Element
+    element_id: str
+    path: str
+    type_tag: str
+    name: str
+    description: str
+    object_name: Optional[str]
+    context: str
+    context_desc: Optional[str]
+
+
+def _find_annotatable_entities(
+    dataset_node: Optional[etree._Element], root: etree._Element
+):
+    """
+    Generator that walks through the EML document and yields every calibratable entity.
+    Provides identical search, bounding, and ID-assignment for parse_eml and export_eml.
+    """
+    search_base = dataset_node if dataset_node is not None else root
+    if search_base is None:
+        return
+
+    entity_configs = [
+        ("dataTable", "DATATABLE", "Data Table Entity"),
+        ("otherEntity", "OTHERENTITY", "Other Entity"),
+        ("spatialRaster", "SPATIALRASTER", "Spatial Raster Entity"),
+        ("spatialVector", "SPATIALVECTOR", "Spatial Vector Entity"),
+    ]
+
+    for entity_tag, entity_type, entity_label in entity_configs:
+        entity_nodes = _findall_recursive(search_base, entity_tag)
+        for entity_idx, entity_node in enumerate(entity_nodes):
+            xml_id = entity_node.get("id")
+            path_entity = f"dataset/{entity_tag}[{entity_idx}]"
+            entity_id = _make_id(xml_id, path_entity)
+
+            entity_name = (
+                _text(entity_node, "entityName") or f"{entity_label} {entity_idx + 1}"
+            )
+            entity_desc = _text(entity_node, "entityDescription")
+            object_name = _text(entity_node, "objectName")
+
+            yield EmlEntity(
+                node=entity_node,
+                element_id=entity_id,
+                path=path_entity,
+                type_tag=entity_type,
+                name=entity_name,
+                description=entity_desc or entity_label,
+                object_name=object_name,
+                context=entity_name,
+                context_desc=entity_desc,
+            )
+
+            # Attributes within this entity
+            attr_list_nodes = _findall_recursive(entity_node, "attribute")
+            for attr_idx, attr_node in enumerate(attr_list_nodes):
+                attr_xml_id = attr_node.get("id")
+                path_attr = f"{path_entity}/attributeList/attribute[{attr_idx}]"
+                attr_id = _make_id(attr_xml_id, path_attr)
+
+                attr_name = _text(attr_node, "attributeName")
+                attr_def = _text(attr_node, "attributeDefinition")
+
+                yield EmlEntity(
+                    node=attr_node,
+                    element_id=attr_id,
+                    path=path_attr,
+                    type_tag="ATTRIBUTE",
+                    name=attr_name,
+                    description=attr_def,
+                    object_name=object_name,
+                    context=entity_name,
+                    context_desc=entity_desc,
+                )
+
+    # Geographic Coverage
+    geo_nodes = _findall_recursive(search_base, "geographicCoverage")
+    for geo_idx, geo_node in enumerate(geo_nodes):
+        geo_desc = _text(
+            geo_node, "geographicDescription"
+        )  # No entityName/attributeName for location
+        geo_xml_id = geo_node.get("id")
+        path_geo = f"dataset/coverage/geographicCoverage[{geo_idx}]"
+        geo_id = _make_id(geo_xml_id, path_geo)
+
+        yield EmlEntity(
+            node=geo_node,
+            element_id=geo_id,
+            path=path_geo,
+            type_tag="COVERAGE",
+            name="Location",
+            description=geo_desc,
+            object_name=None,
+            context="Geographic Coverage",
+            context_desc=None,
+        )
+
+
 def parse_eml(xml_string: str) -> list[dict[str, Any]]:
     """
-    Parse an EML XML string and return a list of annotatable target dicts.
+    Parse an EML XML string and extract relevant metadata into flat JSON objects.
 
     Each dict conforms to the AnnotatableElement schema (id, path, context,
     contextDescription, objectName, name, description, type,
@@ -301,99 +403,46 @@ def parse_eml(xml_string: str) -> list[dict[str, Any]]:
     )
 
     # ------------------------------------------------------------------
-    # 1. Entities and their attributes
+    # 1. & 2. Entities, Attributes, and Geographic Coverage
     # ------------------------------------------------------------------
-    entity_configs = [
-        ("dataTable", "DATATABLE", "Data Table Entity"),
-        ("otherEntity", "OTHERENTITY", "Other Entity"),
-        ("spatialRaster", "SPATIALRASTER", "Spatial Raster Entity"),
-        ("spatialVector", "SPATIALVECTOR", "Spatial Vector Entity"),
-    ]
+    for entity in _find_annotatable_entities(dataset_node, root):
+        if entity.type_tag == "COVERAGE":
+            direct_annotations = _parse_child_annotations(entity.node)
+            detached_annotations = detached.get(entity.element_id, [])
+            combined = direct_annotations + detached_annotations
 
-    for entity_tag, entity_type, entity_label in entity_configs:
-        entity_nodes = _findall_recursive(dataset_node, entity_tag)
-        for entity_idx, entity_node in enumerate(entity_nodes):
-            entity_name = (
-                _text(entity_node, "entityName") or f"{entity_label} {entity_idx + 1}"
-            )
-            entity_desc = _text(entity_node, "entityDescription")
-            object_name = _text(entity_node, "objectName")
-            xml_id = entity_node.get("id")
-            path_entity = f"dataset/{entity_tag}[{entity_idx}]"
-            entity_id = _make_id(xml_id, path_entity)
-
-            entity_annotations = _parse_child_annotations(entity_node)
             elements.append(
                 {
-                    "id": entity_id,
-                    "path": path_entity,
-                    "context": entity_name,
-                    "contextDescription": entity_desc,
-                    "objectName": object_name or None,
-                    "name": entity_name,
-                    "description": entity_desc or entity_label,
-                    "type": entity_type,
+                    "id": entity.element_id,
+                    "path": entity.path,
+                    "context": entity.context,
+                    "contextDescription": entity.context_desc,
+                    "objectName": entity.object_name,
+                    "name": entity.name,
+                    "description": entity.description,
+                    "type": entity.type_tag,
+                    "currentAnnotations": combined,
+                    "recommendedAnnotations": [],
+                    "status": "APPROVED" if combined else "PENDING",
+                }
+            )
+        else:
+            entity_annotations = _parse_child_annotations(entity.node)
+            elements.append(
+                {
+                    "id": entity.element_id,
+                    "path": entity.path,
+                    "context": entity.context,
+                    "contextDescription": entity.context_desc,
+                    "objectName": entity.object_name,
+                    "name": entity.name,
+                    "description": entity.description,
+                    "type": entity.type_tag,
                     "currentAnnotations": entity_annotations,
                     "recommendedAnnotations": [],
                     "status": "APPROVED" if entity_annotations else "PENDING",
                 }
             )
-
-            # Attributes within this entity
-            attr_list_nodes = _findall_recursive(entity_node, "attribute")
-            for attr_idx, attr_node in enumerate(attr_list_nodes):
-                attr_name = _text(attr_node, "attributeName")
-                attr_def = _text(attr_node, "attributeDefinition")
-                attr_xml_id = attr_node.get("id")
-                path_attr = f"{path_entity}/attributeList/attribute[{attr_idx}]"
-                attr_id = _make_id(attr_xml_id, path_attr)
-
-                attr_annotations = _parse_child_annotations(attr_node)
-                elements.append(
-                    {
-                        "id": attr_id,
-                        "path": path_attr,
-                        "context": entity_name,
-                        "contextDescription": entity_desc,
-                        "objectName": object_name or None,
-                        "name": attr_name,
-                        "description": attr_def,
-                        "type": "ATTRIBUTE",
-                        "currentAnnotations": attr_annotations,
-                        "recommendedAnnotations": [],
-                        "status": "APPROVED" if attr_annotations else "PENDING",
-                    }
-                )
-
-    # ------------------------------------------------------------------
-    # 2. Geographic Coverage
-    # ------------------------------------------------------------------
-    geo_nodes = _findall_recursive(dataset_node, "geographicCoverage")
-    for geo_idx, geo_node in enumerate(geo_nodes):
-        geo_desc = _text(geo_node, "geographicDescription")
-        geo_xml_id = geo_node.get("id")
-        path_geo = f"dataset/coverage/geographicCoverage[{geo_idx}]"
-        geo_id = _make_id(geo_xml_id, path_geo)
-
-        direct_annotations = _parse_child_annotations(geo_node)
-        detached_annotations = detached.get(geo_id, [])
-        combined = direct_annotations + detached_annotations
-
-        elements.append(
-            {
-                "id": geo_id,
-                "path": path_geo,
-                "context": "Geographic Coverage",
-                "contextDescription": None,
-                "objectName": None,
-                "name": "Location",
-                "description": geo_desc,
-                "type": "COVERAGE",
-                "currentAnnotations": combined,
-                "recommendedAnnotations": [],
-                "status": "APPROVED" if combined else "PENDING",
-            }
-        )
 
     logger.info("parse_eml: extracted %d annotatable elements.", len(elements))
     return elements
@@ -520,72 +569,60 @@ def export_eml(xml_string: str, elements: list[dict[str, Any]]) -> str:
                 _insert_before_first_match(dataset_node, anno_el, *ref_candidates)
 
     # ------------------------------------------------------------------
-    # 2. Entities and their attributes — inline annotations
+    # 2. Entities, Attributes, and Coverage — annotations
     # ------------------------------------------------------------------
-    entity_tags = ("dataTable", "otherEntity", "spatialRaster", "spatialVector")
+    geo_elements = []
 
-    for entity_tag in entity_tags:
-        entity_nodes = _findall_recursive(
-            dataset_node if dataset_node is not None else root, entity_tag
-        )
-        for entity_idx, entity_node in enumerate(entity_nodes):
-            xml_id = entity_node.get("id")
-            path_entity = f"dataset/{entity_tag}[{entity_idx}]"
-            entity_id = _make_id(xml_id, path_entity)
-            entity_model = element_by_id.get(entity_id)
+    for entity in _find_annotatable_entities(dataset_node, root):
+        entity_model = element_by_id.get(entity.element_id)
+        if not entity_model:
+            continue
 
-            if entity_model:
-                _remove_child_annotations(entity_node)
-                for anno in entity_model.get("currentAnnotations", []):
-                    anno_el = etree.Element("annotation")
-                    prop_el = etree.SubElement(anno_el, "propertyURI")
-                    prop_el.set("label", anno.get("propertyLabel") or "contains")
-                    prop_el.text = (
-                        anno.get("propertyUri") or "http://www.w3.org/ns/oa#hasBody"
-                    )
-                    val_el = etree.SubElement(anno_el, "valueURI")
-                    val_el.set("label", anno.get("label", ""))
-                    val_el.text = anno.get("uri", "")
-                    _insert_before_first_match(
-                        entity_node,
-                        anno_el,
-                        "attributeList",
-                        "constraint",
-                        "spatialReference",
-                        "geospatial",
-                        "geometry",
-                    )
-
-            # Attributes
-            attr_nodes = _findall_recursive(entity_node, "attribute")
-            for attr_idx, attr_node in enumerate(attr_nodes):
-                attr_xml_id = attr_node.get("id")
-                path_attr = f"{path_entity}/attributeList/attribute[{attr_idx}]"
-                attr_id = _make_id(attr_xml_id, path_attr)
-                attr_model = element_by_id.get(attr_id)
-
-                if attr_model:
-                    _remove_child_annotations(attr_node)
-                    for anno in attr_model.get("currentAnnotations", []):
-                        anno_el = etree.SubElement(attr_node, "annotation")
-                        prop_el = etree.SubElement(anno_el, "propertyURI")
-                        prop_el.set("label", anno.get("propertyLabel") or "contains")
-                        prop_el.text = (
-                            anno.get("propertyUri") or "http://www.w3.org/ns/oa#hasBody"
-                        )
-                        val_el = etree.SubElement(anno_el, "valueURI")
-                        val_el.set("label", anno.get("label", ""))
-                        val_el.text = anno.get("uri", "")
+        if entity.type_tag in (
+            "DATATABLE",
+            "OTHERENTITY",
+            "SPATIALRASTER",
+            "SPATIALVECTOR",
+        ):
+            _remove_child_annotations(entity.node)
+            for anno in entity_model.get("currentAnnotations", []):
+                anno_el = etree.Element("annotation")
+                prop_el = etree.SubElement(anno_el, "propertyURI")
+                prop_el.set("label", anno.get("propertyLabel") or "contains")
+                prop_el.text = (
+                    anno.get("propertyUri") or "http://www.w3.org/ns/oa#hasBody"
+                )
+                val_el = etree.SubElement(anno_el, "valueURI")
+                val_el.set("label", anno.get("label", ""))
+                val_el.text = anno.get("uri", "")
+                _insert_before_first_match(
+                    entity.node,
+                    anno_el,
+                    "attributeList",
+                    "constraint",
+                    "spatialReference",
+                    "geospatial",
+                    "geometry",
+                )
+        elif entity.type_tag == "ATTRIBUTE":
+            _remove_child_annotations(entity.node)
+            for anno in entity_model.get("currentAnnotations", []):
+                anno_el = etree.SubElement(entity.node, "annotation")
+                prop_el = etree.SubElement(anno_el, "propertyURI")
+                prop_el.set("label", anno.get("propertyLabel") or "contains")
+                prop_el.text = (
+                    anno.get("propertyUri") or "http://www.w3.org/ns/oa#hasBody"
+                )
+                val_el = etree.SubElement(anno_el, "valueURI")
+                val_el.set("label", anno.get("label", ""))
+                val_el.text = anno.get("uri", "")
+        elif entity.type_tag == "COVERAGE":
+            geo_elements.append((entity, entity_model))
 
     # ------------------------------------------------------------------
     # 3. Geographic Coverage — detached annotations block
     # ------------------------------------------------------------------
-    geo_elements = [el for el in elements if el.get("type") == "COVERAGE"]
     if geo_elements:
-        geo_nodes = _findall_recursive(
-            dataset_node if dataset_node is not None else root, "geographicCoverage"
-        )
-
         # Find or create <annotations> block on the document root
         annotations_block = None
         for child in root:
@@ -611,11 +648,9 @@ def export_eml(xml_string: str, elements: list[dict[str, Any]]) -> str:
             else:
                 root.append(annotations_block)
 
-        for geo_idx, geo_model in enumerate(geo_elements):
-            geo_id = geo_model["id"]
-            geo_node = geo_nodes[geo_idx] if geo_idx < len(geo_nodes) else None
-            if geo_node is None:
-                continue
+        for entity, geo_model in geo_elements:
+            geo_id = entity.element_id
+            geo_node = entity.node
 
             # Ensure the XML node carries the canonical id
             if geo_node.get("id") != geo_id:
