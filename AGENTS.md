@@ -63,7 +63,7 @@ As an AI agent, you **MUST STRICTLY ADHERE** to the following **Angular commit s
 **Syntax:** `type(scope): <subject> (#pr_number) [#issue_number]`
 
 - **Type** (Required): MUST be exactly one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
-- **Scope** (Optional): The affected area (e.g., `engine`, `studio`).
+- **Scope** (Required): The affected area (e.g., `engine`, `studio`). MUST be included to provide context.
 - **Subject** (Required): A short, imperative summary. Use verbs like "add", "fix", "update" (NOT "added", "fixes", "updated").
 - **PR Number** (Conditional): If there is an associated pull request, you MUST include its number in parentheses at the end of the subject line (e.g., `(#42)`).
 - **Constraint**: The entire header line MUST be **under 52 characters**.
