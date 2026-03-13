@@ -61,22 +61,35 @@ The frontend is a React application built with Vite and TypeScript.
 
 ## Commit Message Guidelines
 
-We use the **Angular commit style** to streamline the release process via Python Semantic Release.
+As an AI agent, you **MUST STRICTLY ADHERE** to the following **Angular commit style** rules. This is critical for our automated release process via Python Semantic Release.
 
-### Format
-`type(scope): <subject> [#issue]`
+### 1. Header (First Line)
+**Syntax:** `type(scope): <subject> (#pr_number) [#issue_number]`
 
-- **Type**: Must be one of `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, or `revert`.
-- **Scope**: (Optional) The module or area of the change (e.g., `engine`, `studio`, `api`).
-- **Subject**: A short, imperative-voice summary (e.g., "add login endpoint").
-- **Body**: (Optional) Detailed explanation.
-- **Footer**: (Optional) For breaking changes or issue references (e.g., `Closes #123`).
+- **Type** (Required): MUST be exactly one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`.
+- **Scope** (Required): The affected area (e.g., `engine`, `studio`). MUST be included to provide context.
+- **Subject** (Required): A short, imperative summary. Use verbs like "add", "fix", "update" (NOT "added", "fixes", "updated").
+- **PR Number** (Conditional): If there is an associated pull request, you MUST include its number in parentheses at the end of the subject line (e.g., `(#42)`).
+- **Constraint**: The entire header line MUST be **under 52 characters**.
 
-### Constraints
-- **Imperative Voice**: Use "add", "fix", "update" instead of "added", "fixes", "updated".
-- **Header Length**: Keep the header (type + scope + subject) under **52 characters**.
-- **Body Length**: Wrap the body text at **72 characters**.
-- **Issue Referencing**: Automatically close issues using keywords (e.g., `Closes #123`) in the footer or subject when relevant.
+### 2. Body (After one blank line)
+- **Content** (Required): You MUST provide a clear overview of the exact changes made AND the motivating rationale behind them (why the changes were necessary).
+- **Constraint**: Wrap all lines in the body at **< 72 characters**.
+
+### 3. Footer (After another blank line)
+- **Content** (Optional): List any breaking changes or references to closed issues (e.g., `Closes #123`).
+
+### Example of a Good Commit
+```text
+fix(engine): resolve edge case parsing failures (#42)
+
+The previous parser implementation failed to handle nested
+XML nodes properly, leading to skipped elements. This updates
+the recursive logic to process all children accurately.
+The rationale is to ensure 100% data extraction reliability.
+
+Closes #123
+```
 
 ## Pre-flight Checklist for Agents
 
@@ -92,6 +105,8 @@ Before submitting any changes, please ensure you have completed the following:
     - [ ] Update any relevant comments or documentation if the architecture or configuration changes.
     - [ ] Update this `AGENTS.md` file if any environment setup, tools, or best practices change.
 4.  **Submission**:
+    - [ ] **NEVER** commit directly to the `main` branch. All changes MUST be committed to a feature branch.
+    - [ ] Create a Pull Request (PR) from your feature branch to the `main` branch.
     - [ ] Use the **Angular commit style** for the commit message.
-    - [ ] Ensure the header is under 52 characters and the body is wrapped at 72 characters.
+    - [ ] Ensure the header is under 52 characters and the body is wrapped at < 72 characters.
     - [ ] Include issue references to automatically close related issues.
