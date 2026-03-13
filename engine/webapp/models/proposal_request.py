@@ -3,8 +3,9 @@ Pydantic models for proposal requests, term details, and submitter information i
 engine.
 """
 
+from datetime import datetime, timezone
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class TermDetails(BaseModel):
@@ -35,3 +36,4 @@ class ProposalRequest(BaseModel):
     target_vocabulary: str
     term_details: TermDetails
     submitter_info: SubmitterInfo
+    proposed_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
