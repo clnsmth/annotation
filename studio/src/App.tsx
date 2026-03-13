@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { Layout } from './components/Layout';
 import { FileUpload } from './components/FileUpload';
 import { AnnotationEditor } from './components/AnnotationEditor';
-import { emlParser } from './services/emlParser';
 import { documentService } from './services/documentService';
 import { recommenderService } from './services/recommenderService';
-import { config } from './config';
 import { AnnotatableElement, OntologyTerm } from './types';
 import { Loader2, Download, CheckCircle, RotateCcw, AlertTriangle } from 'lucide-react';
 import { EXAMPLE_EML_XML } from './constants/mockData';
@@ -56,17 +54,11 @@ export default function App() {
       await new Promise(r => setTimeout(r, 500));
       let parsedElements: AnnotatableElement[];
 
-      if (config.features.useBackendParser) {
-        console.log('Using new backend API for parsing via config toggle.');
-        if (file) {
-           parsedElements = await documentService.getTargets(file);
-        } else {
-           // Fallback for example data if file wasn't provided directly
-           parsedElements = await documentService.getTargetsFromString(content, name);
-        }
+      if (file) {
+        parsedElements = await documentService.getTargets(file);
       } else {
-        console.log('Using legacy local browser parser via config toggle.');
-        parsedElements = emlParser.parse(content);
+        // Fallback for example data if file wasn't provided directly
+        parsedElements = await documentService.getTargetsFromString(content, name);
       }
       setElements(parsedElements);
 
@@ -124,11 +116,7 @@ export default function App() {
     setIsExporting(true);
     let finalXml: string;
     try {
-      if (config.features.useBackendParser) {
-        finalXml = await documentService.exportDocument(xmlContent, elements);
-      } else {
-        finalXml = emlParser.exportXml(xmlContent, elements);
-      }
+      finalXml = await documentService.exportDocument(xmlContent, elements);
       
       const blob = new Blob([finalXml], { type: 'text/xml' });
       const url = URL.createObjectURL(blob);
