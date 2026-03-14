@@ -75,6 +75,9 @@ As an AI agent, you **MUST STRICTLY ADHERE** to the following **Angular commit s
 ### 3. Footer (After another blank line)
 - **Content** (Optional): List any breaking changes or references to closed issues (e.g., `Closes #123`).
 
+> [!TIP]
+> If you are struggling to enforce the strict 72-character limit on body wrapping, please reference and execute the **Commit with Wrapping Workflow** located at `.agents/workflows/commit-with-wrapping.md`.
+
 ### Example of a Good Commit
 ```text
 fix(engine): resolve edge case parsing failures (#42)
