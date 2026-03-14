@@ -9,7 +9,7 @@ from typing import List, Dict, Any
 import smtplib
 import requests
 from webapp.config import Config
-from webapp.utils.utils import merge_recommender_results
+from webapp.utils.utils import merge_recommender_results, reformat_attribute_elements
 from webapp.models.mock_objects import (
     MOCK_RAW_ATTRIBUTE_RECOMMENDATIONS_BY_FILE,
     MOCK_GEOGRAPHICCOVERAGE_RECOMMENDATIONS,
@@ -86,9 +86,31 @@ def _normalize_recommender_response(raw_response):
     return recommender_response
 
 
+def _fetch_attribute_recommendations_batch(
+    api_url: str, api_payload: List[Dict[str, Any]], object_name: str
+) -> List[Dict[str, Any]]:
+    """
+    Submits attribute recommendations payload to the remote API in batches.
+    """
+    recommender_response: List[Dict[str, Any]] = []
+    batch_size = Config.ANNOTATE_BATCH_SIZE
+    for i in range(0, len(api_payload), batch_size):
+        chunk = api_payload[i : i + batch_size]
+        try:
+            response = requests.post(api_url, json=chunk, timeout=60)
+            response.raise_for_status()
+            raw_response = response.json()
+            chunk_response = _normalize_recommender_response(raw_response)
+            recommender_response.extend(chunk_response)
+        except requests.exceptions.RequestException as e:
+            print(f"An error occurred for {object_name} (chunk {i // batch_size + 1}): {e}")
+            continue
+    return recommender_response
+
+
 # pylint: disable=too-many-locals
 def recommend_for_attribute(
-    attributes: List[Dict[str, Any]], request_id: str = None
+    attributes: List[Dict[str, Any]], request_id: str | None = None
 ) -> List[Dict[str, Any]]:
     """
     Groups attributes by objectName, sends to API (or gets mock per file), and merges results.
@@ -121,17 +143,11 @@ def recommend_for_attribute(
             final_output.extend(file_results)
         else:
             # REAL API LOGIC
-            api_payload = [
-                {k: v for k, v in i.items() if k != "id"} for i in file_attributes
-            ]
-            try:
-                response = requests.post(api_url, json=api_payload, timeout=60)
-                response.raise_for_status()
-                raw_response = response.json()
-                recommender_response = _normalize_recommender_response(raw_response)
-            except requests.exceptions.RequestException as e:
-                print(f"An error occurred for {object_name}: {e}")
-                continue
+            api_payload = reformat_attribute_elements(file_attributes)
+            recommender_response = _fetch_attribute_recommendations_batch(
+                api_url, api_payload, object_name
+            )
+
             # Merge results for this file group
             file_results = merge_recommender_results(
                 file_attributes, recommender_response, "ATTRIBUTE"
@@ -144,7 +160,7 @@ def recommend_for_attribute(
 
 
 def recommend_for_geographic_coverage(
-    geos: List[Dict[str, Any]], request_id: str = None
+    geos: List[Dict[str, Any]], request_id: str | None = None
 ) -> List[Dict[str, Any]]:
     """
     Stub recommender for geographic coverage elements.
