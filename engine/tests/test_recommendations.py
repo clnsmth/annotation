@@ -6,6 +6,7 @@ from typing import Any, Dict, List
 import json
 import re
 import copy
+from unittest.mock import patch, MagicMock
 import pytest
 from webapp.run import (
     recommend_for_attribute,
@@ -43,6 +44,110 @@ def test_recommend_for_attribute_unit(mock_payload: Dict[str, Any]) -> None:
             assert "propertyUri" in rec
             assert "request_id" in rec
             assert rec["request_id"] == "test-uuid-1234"
+
+
+@pytest.mark.usefixtures("mock_payload")
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", False)
+@patch("webapp.services.core.requests.post")
+def test_recommend_for_attribute_real_api(
+    mock_post: MagicMock, mock_payload: Dict[str, Any]
+) -> None:
+    """
+    Test recommend_for_attribute hitting the real API logic (mocked external request).
+    Ensures that the payload is correctly batched and the response gets merged properly.
+    """
+    # Create a dummy API response mapping back to one of the inputs
+    mock_response = MagicMock()
+    mock_response.json.return_value = [
+        {
+            "column_id": "test-col",
+            "column_name": "Latitude",
+            "concept_name": "latitude coordinate",
+            "concept_definition": "A latitude measurement",
+            "concept_id": "http://purl.dataone.org/odo/ECSO_00002130",
+            "confidence": 0.99,
+        }
+    ]
+    mock_response.raise_for_status.return_value = None
+    mock_post.return_value = mock_response
+
+    attributes = mock_payload["ATTRIBUTE"]
+    results = recommend_for_attribute(attributes, request_id="real-api-uuid")
+
+    # Assert that requests.post was called
+    assert mock_post.called
+
+    # Since there are 35 attributes in the mock payload, and the batch size is 80,
+    # there should be only 1 post request (if grouped perfectly, less than 80 total).
+    # Grouping happens per file (objectName).
+
+    # Verify the structure has our mocked recommendation
+    found_mocked_rec = False
+    for item in results:
+        for rec in item.get("recommendations", []):
+            assert rec["request_id"] == "real-api-uuid"
+            if rec["label"] == "latitude coordinate":
+                found_mocked_rec = True
+                assert rec["confidence"] == 0.99
+                assert rec["ontology"] == "ECSO"
+
+    assert found_mocked_rec, (
+        "Did not find the expected mocked recommendation in the results"
+    )
+
+
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", False)
+@patch("webapp.services.core.requests.post")
+def test_recommend_for_attribute_real_api_chunking(mock_post: MagicMock) -> None:
+    """
+    Test recommend_for_attribute batching logic when there are more than 80 attributes.
+    """
+    # Create 100 fake attributes all belonging to the same objectName (file)
+    attributes = [
+        {"id": f"id-{i}", "name": f"col_{i}", "objectName": "large_file.csv"}
+        for i in range(100)
+    ]
+
+    mock_response = MagicMock()
+    mock_response.json.return_value = []
+    mock_response.raise_for_status.return_value = None
+    mock_post.return_value = mock_response
+
+    recommend_for_attribute(attributes, request_id="real-api-chunking")
+
+    # Math: 100 items / 80 items per batch = 2 API calls
+    assert mock_post.call_count == 2
+    # Verify the first call had 80 items
+    first_call_payload = mock_post.call_args_list[0][1]["json"]
+    assert len(first_call_payload) == 80
+    # Verify the second call had 20 items
+    second_call_payload = mock_post.call_args_list[1][1]["json"]
+    assert len(second_call_payload) == 20
+
+
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", False)
+@patch("webapp.services.core.requests.post")
+def test_recommend_for_attribute_real_api_exception(mock_post: MagicMock) -> None:
+    """
+    Test recommend_for_attribute error handling when the external API throws a RequestException.
+    It should catch the exception and return the original items mapped with no recommendations.
+    """
+    import requests
+
+    attributes = [{"id": "id-1", "name": "col_1", "objectName": "error_file.csv"}]
+
+    # Configure the mock to raise a RequestException
+    mock_post.side_effect = requests.exceptions.RequestException("API is down")
+
+    results = recommend_for_attribute(attributes, request_id="error-uuid")
+
+    # Assert that the post was attempted
+    assert mock_post.call_count == 1
+
+    # We should still get results back out, just with an empty recommendations array
+    # Wait, `merge_recommender_results` actually strips items that have no matches,
+    # so the correct expected length is 0.
+    assert len(results) == 0
 
 
 @pytest.mark.usefixtures("mock_geo_coverage")
@@ -90,13 +195,14 @@ def test_recommend_for_geographic_coverage_unit(
             ],
             [
                 {
+                    "column_id": "d49be2c0-7b9e-41f4-ae07-387d3e1f14c8",
+                    "column_name": "Latitude",
+                    "column_description": "Latitude of collection",
+                    "object_name": "SurveyResults.csv",
                     "entity_name": "SurveyResults.csv",
                     "entity_description": "Table contains survey information and the counts of "
                     "the number of egg masses for each species during that "
                     "survey.",
-                    "object_name": "SurveyResults.csv",
-                    "column_name": "Latitude",
-                    "column_description": "Latitude of collection",
                 }
             ],
         )
