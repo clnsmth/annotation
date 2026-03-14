@@ -30,7 +30,6 @@ export interface AnnotatableElement {
   currentAnnotations: OntologyTerm[];
   recommendedAnnotations: OntologyTerm[];
   status: AnnotationStatus;
-  originalXmlNode?: Node; // Reference to DOM node for export
 }
 
 export interface EmlData {

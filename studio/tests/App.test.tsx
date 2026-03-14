@@ -86,7 +86,7 @@ describe('App Integration', () => {
         const user = userEvent.setup();
         render(<App />);
 
-        // We'll mock documentService.getTargets instead of emlParser (since test is running with backend parsing ON by default)
+        // We mock documentService.getTargets to simulate a backend parsing error
         const parseSpy = vi.spyOn(await import('../src/services/documentService').then(m => m.documentService), 'getTargets').mockImplementation(() => {
             return Promise.reject(new Error('Backend Error 422: EML version 2.1 detected.'));
         });
