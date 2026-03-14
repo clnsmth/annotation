@@ -103,11 +103,12 @@ def reformat_attribute_elements(
         try:
             reformatted.append(
                 {
-                    "entity_name": attr.get("objectName"),
-                    "entity_description": attr.get("entityDescription"),
-                    "object_name": attr.get("objectName"),
-                    "column_name": attr.get("name"),
-                    "column_description": attr.get("description"),
+                    "column_id": attr.get("id", ""),
+                    "column_name": attr.get("name", ""),
+                    "column_description": attr.get("description", ""),
+                    "object_name": attr.get("objectName", ""),
+                    "entity_name": attr.get("objectName", ""),
+                    "entity_description": attr.get("entityDescription", ""),
                 }
             )
         except (KeyError, TypeError, ValueError) as e:

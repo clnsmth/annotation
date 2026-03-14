@@ -36,3 +36,4 @@ class Config:
     _BASE_URL: str = "http://xx.xx.xx.xx:xxxx"
     _ANNOTATE_ENDPOINT: str = "/api/xxx"
     API_URL: str = f"{_BASE_URL}{_ANNOTATE_ENDPOINT}"
+    ANNOTATE_BATCH_SIZE: int = 80
