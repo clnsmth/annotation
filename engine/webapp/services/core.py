@@ -103,7 +103,9 @@ def _fetch_attribute_recommendations_batch(
             chunk_response = _normalize_recommender_response(raw_response)
             recommender_response.extend(chunk_response)
         except requests.exceptions.RequestException as e:
-            print(f"An error occurred for {object_name} (chunk {i // batch_size + 1}): {e}")
+            print(
+                f"An error occurred for {object_name} (chunk {i // batch_size + 1}): {e}"
+            )
             continue
     return recommender_response
 
