@@ -177,6 +177,94 @@ def test_recommend_for_geographic_coverage_unit(
     assert results == mock_geo_coverage
 
 
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", False)
+def test_recommend_for_geographic_coverage_real_geoenv() -> None:
+    """
+    Test recommend_for_geographic_coverage with real geoenv logic (mocked resolver).
+    Verifies response parsing, recommendation formatting, and deduplication.
+    """
+    # Build a fake geoenv Response object
+    fake_response_data = {
+        "type": "Feature",
+        "geometry": {"type": "Polygon", "coordinates": [[]]},
+        "properties": {
+            "description": None,
+            "environment": [
+                {
+                    "dataSource": {"name": "WorldTerrestrialEcosystems"},
+                    "properties": {"climate": "Warm Temperate"},
+                    "mappedProperties": [
+                        {
+                            "label": "temperate",
+                            "uri": "http://purl.obolibrary.org/obo/ENVO_01000206",
+                        },
+                    ],
+                },
+                {
+                    "dataSource": {"name": "EcologicalMarineUnits"},
+                    "properties": {},
+                    "mappedProperties": [
+                        {
+                            "label": "lake",
+                            "uri": "http://purl.obolibrary.org/obo/ENVO_00000020",
+                        },
+                        # Duplicate URI — should be deduplicated
+                        {
+                            "label": "temperate",
+                            "uri": "http://purl.obolibrary.org/obo/ENVO_01000206",
+                        },
+                    ],
+                },
+            ],
+        },
+    }
+
+    fake_response = MagicMock()
+    fake_response.data = fake_response_data
+
+    geos = [
+        {
+            "id": "geo-1",
+            "description": "Test coverage",
+            "west": -121.9,
+            "east": -121.8,
+            "north": 47.4,
+            "south": 47.3,
+        }
+    ]
+
+    with (
+        patch("geoenv.resolver.Resolver.resolve", return_value=fake_response),
+        patch(
+            "asyncio.run",
+            side_effect=lambda coro: fake_response,
+        ),
+    ):
+        results = recommend_for_geographic_coverage(geos, request_id="real-geoenv-uuid")
+
+    assert isinstance(results, list)
+    assert len(results) == 1
+    assert results[0]["id"] == "geo-1"
+
+    recs = results[0]["recommendations"]
+    # Should have 2 unique URIs (temperate duplicate removed)
+    assert len(recs) == 2
+
+    for rec in recs:
+        assert "label" in rec
+        assert "uri" in rec
+        assert rec["ontology"] == "ENVO"
+        assert rec["confidence"] == 0.90
+        assert rec["propertyLabel"] == "broad-scale environmental context"
+        assert "propertyUri" in rec
+        assert rec["request_id"] == "real-geoenv-uuid"
+
+    # Verify specific labels
+    labels = {r["label"] for r in recs}
+    assert "temperate" in labels
+    assert "lake" in labels
+
+
 @pytest.mark.parametrize(
     "data,expected",
     [
