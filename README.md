@@ -52,7 +52,6 @@ The API will be available at <http://localhost:8000>.
 ```bash
 cd studio
 npm install
-# Add your Gemini API key to studio/.env.local
 npm run dev
 ```
 
