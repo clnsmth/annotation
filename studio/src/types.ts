@@ -27,6 +27,16 @@ export interface AnnotatableElement {
   name: string; // Element name (e.g., 'dbh')
   description: string; // Element description (e.g., 'Diameter at breast height')
   type: 'ATTRIBUTE' | 'COVERAGE' | 'KEYWORD' | 'DATASET' | 'DATATABLE' | 'OTHERENTITY' | 'SPATIALRASTER' | 'SPATIALVECTOR' | 'OTHER';
+  // Geographic coverage fields
+  west?: number;
+  east?: number;
+  north?: number;
+  south?: number;
+  altitudeMinimum?: number;
+  altitudeMaximum?: number;
+  altitudeUnits?: string;
+  outerGRing?: string;
+  exclusionGRing?: string;
   currentAnnotations: OntologyTerm[];
   recommendedAnnotations: OntologyTerm[];
   status: AnnotationStatus;

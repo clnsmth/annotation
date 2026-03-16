@@ -24,6 +24,7 @@ class Config:
 
     # Centralized configuration for annotation engine
     USE_MOCK_RECOMMENDATIONS: bool = True  # Set to False to use real recommendation logic
+    TEST_WITH_REAL_REQUESTS: bool = False  # Set to True to use real logic in unit tests
     MAX_RECOMMENDATIONS_PER_ELEMENT: int = 3
     MERGE_CONFIG: dict = {
         "ATTRIBUTE": {

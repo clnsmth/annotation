@@ -32,7 +32,18 @@ export class RecommenderService {
         description: e.description,
         context: e.context,
         objectName: e.objectName, // Include the physical file name if available (e.g. for attributes)
-        entityDescription: e.contextDescription // Include context description (e.g. Entity Description for attributes)
+        entityDescription: e.contextDescription, // Include context description (e.g. Entity Description for attributes)
+        ...(e.type === 'COVERAGE' && {
+          west: e.west,
+          east: e.east,
+          north: e.north,
+          south: e.south,
+          altitudeMinimum: e.altitudeMinimum,
+          altitudeMaximum: e.altitudeMaximum,
+          altitudeUnits: e.altitudeUnits,
+          outerGRing: e.outerGRing,
+          exclusionGRing: e.exclusionGRing,
+        })
       });
       totalCount++;
     });

@@ -132,7 +132,9 @@ class GeographicCoverage:
                 [self.west(), self.north(), z],
                 [self.west(), self.south(), z],
             ]
-            coordinates = [list(filter(None, item)) for item in coordinates]
+            coordinates = [
+                [val for val in item if val is not None] for item in coordinates
+            ]
             res = {
                 "type": "Polygon",
                 "coordinates": [coordinates],
@@ -154,11 +156,14 @@ class GeographicCoverage:
                 if ring[0] != ring[-1]:
                     ring.append(ring[0])
                 # Remove None values to comply with GeoJSON spec
-                ring = [list(filter(None, item)) for item in ring]
+                ring = [[val for val in item if val is not None] for item in ring]
                 return ring
 
             if self.outer_gring() is not None:
                 ring = _format_ring(self.outer_gring())
+                # Ensure ring is valid
+                if not ring or len(ring) < 4:
+                    return None
                 res = {"type": "Polygon", "coordinates": [ring]}
                 return json.dumps(res)
 
@@ -170,8 +175,8 @@ class GeographicCoverage:
             return None
         z = self._average_altitudes()
         coordinates = [self.west(), self.north(), z]
-        # Remove z values that are None to comply with GeoJSON spec
-        coordinates = list(filter(None, coordinates))
+        # Remove None values to comply with GeoJSON spec
+        coordinates = [val for val in coordinates if val is not None]
         res = {"type": "Point", "coordinates": coordinates}
         return json.dumps(res)
 
