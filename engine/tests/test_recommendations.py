@@ -151,6 +151,7 @@ def test_recommend_for_attribute_real_api_exception(mock_post: MagicMock) -> Non
 
 
 @pytest.mark.usefixtures("mock_geo_coverage")
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", True)
 def test_recommend_for_geographic_coverage_unit(
     mock_geo_coverage: List[Dict[str, Any]],
 ) -> None:
@@ -321,6 +322,7 @@ def test_reformat_geographic_coverage_elements_unit(data: List[Dict[str, Any]]) 
 
 
 @pytest.mark.usefixtures("client", "mock_payload")
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", True)
 def test_recommend_annotations_endpoint_with_full_mock_frontend_payload(
     client: Any, mock_payload: Dict[str, Any]
 ) -> None:
@@ -351,6 +353,7 @@ def test_recommend_annotations_endpoint_with_full_mock_frontend_payload(
 
 
 @pytest.mark.usefixtures("client", "mock_payload")
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", True)
 def test_recommendations_endpoint_snapshot(
     client: Any, mock_payload: Dict[str, Any]
 ) -> None:

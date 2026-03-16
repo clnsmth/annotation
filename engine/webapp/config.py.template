@@ -13,6 +13,7 @@ class Config:
     :cvar SMTP_USER: SMTP username
     :cvar SMTP_PASSWORD: SMTP password
     :cvar USE_MOCK_RECOMMENDATIONS: Whether to use mock recommendations
+    :cvar MAX_RECOMMENDATIONS_PER_ELEMENT: Max recommendations per element
     :cvar MERGE_CONFIG: Configuration for merging recommender results
     """
     VOCABULARY_PROPOSAL_RECIPIENT = 'curator@mail.com'
@@ -23,6 +24,7 @@ class Config:
 
     # Centralized configuration for annotation engine
     USE_MOCK_RECOMMENDATIONS: bool = True  # Set to False to use real recommendation logic
+    MAX_RECOMMENDATIONS_PER_ELEMENT: int = 3
     MERGE_CONFIG: dict = {
         "ATTRIBUTE": {
             "property_label": "contains measurements of type",

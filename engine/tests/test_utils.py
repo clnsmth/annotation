@@ -107,3 +107,26 @@ def test_normalize_recommender_response_list_passthrough() -> None:
     raw: List[Dict[str, Any]] = [{"concept_name": "A"}, {"concept_name": "B"}]
     result = _normalize_recommender_response(raw)
     assert result == raw
+
+
+def test_merge_recommender_results_limits_to_top_three() -> None:
+    """
+    merge_recommender_results keeps only the top 3 recommendations per
+    source item, sorted by confidence descending.
+    """
+    source = [{"id": "item-1", "name": "col1", "objectName": "data.csv"}]
+    recs: List[Dict[str, Any]] = [
+        {
+            "column_name": "col1",
+            "concept_name": f"Concept_{i}",
+            "concept_id": "http://purl.obolibrary.org/obo/ENVO_00000001",
+            "confidence": conf,
+            "concept_definition": f"Def {i}",
+        }
+        for i, conf in enumerate([0.50, 0.99, 0.70, 0.85, 0.60])
+    ]
+    results = merge_recommender_results(source, recs, "ATTRIBUTE")
+    assert len(results) == 1
+    returned_recs = results[0]["recommendations"]
+    assert len(returned_recs) == 3
+    assert [r["confidence"] for r in returned_recs] == [0.99, 0.85, 0.70]
