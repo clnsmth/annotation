@@ -84,6 +84,13 @@ def merge_recommender_results(
                         item.get("id"),
                         e,
                     )
+            # Keep only the top-N recommendations by confidence
+            max_recs = Config.MAX_RECOMMENDATIONS_PER_ELEMENT
+            entry["recommendations"].sort(
+                key=lambda r: r.get("confidence", 0.0),
+                reverse=True,
+            )
+            entry["recommendations"] = entry["recommendations"][:max_recs]
             merged_results.append(entry)
     logger.info("Merged %d source items with recommender results.", len(merged_results))
     return merged_results
