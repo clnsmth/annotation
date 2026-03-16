@@ -580,7 +580,8 @@ def export_eml(xml_string: str, elements: list[dict[str, Any]]) -> str:
     :return: Updated EML XML string
     """
     try:
-        root = etree.fromstring(xml_string.encode())
+        parser = etree.XMLParser(resolve_entities=False)
+        root = etree.fromstring(xml_string.encode(), parser=parser)
     except etree.XMLSyntaxError as exc:
         raise ValueError(f"Invalid XML: {exc}") from exc
 
