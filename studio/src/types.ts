@@ -58,12 +58,5 @@ export interface AppState {
 }
 
 export interface RecommenderRequest {
-  [key: string]: {
-    id: string;
-    name: string;
-    description: string;
-    context: string;
-    objectName?: string;
-    entityDescription?: string;
-  }[];
+  [key: string]: AnnotatableElement[];
 }

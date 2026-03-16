@@ -277,7 +277,7 @@ def test_recommend_for_geographic_coverage_real_geoenv() -> None:
                     "description": "Latitude of collection",
                     "context": "SurveyResults",
                     "objectName": "SurveyResults.csv",
-                    "entityDescription": "Table contains survey information and the counts of "
+                        "contextDescription": "Table contains survey information and the counts of "
                     "the number of egg masses for each species during that "
                     "survey.",
                 }
@@ -308,17 +308,38 @@ def test_reformat_attribute_elements_unit(
 
 
 @pytest.mark.parametrize(
-    "data",
+    "data,expected",
     [
-        ([{"description": "D1"}, {"description": "D2"}]),
+        (
+            [{"description": "D1", "id": "G1", "west": 1.0}],
+            [
+                {
+                    "id": "G1",
+                    "name": None,
+                    "description": "D1",
+                    "context": None,
+                    "west": 1.0,
+                    "east": None,
+                    "north": None,
+                    "south": None,
+                    "altitudeMinimum": None,
+                    "altitudeMaximum": None,
+                    "altitudeUnits": None,
+                    "outerGRing": None,
+                    "exclusionGRing": None,
+                }
+            ],
+        ),
     ],
 )
-def test_reformat_geographic_coverage_elements_unit(data: List[Dict[str, Any]]) -> None:
+def test_reformat_geographic_coverage_elements_unit(
+    data: List[Dict[str, Any]], expected: List[Dict[str, Any]]
+) -> None:
     """
-    Test reformat_geographic_coverage_elements utility function for pass-through behavior.
+    Test reformat_geographic_coverage_elements utility function.
     """
     out = reformat_geographic_coverage_elements(data)
-    assert out == data
+    assert out == expected
 
 
 @pytest.mark.usefixtures("client", "mock_payload")

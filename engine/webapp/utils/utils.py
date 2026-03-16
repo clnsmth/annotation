@@ -115,7 +115,7 @@ def reformat_attribute_elements(
                     "column_description": attr.get("description", ""),
                     "object_name": attr.get("objectName", ""),
                     "entity_name": attr.get("objectName", ""),
-                    "entity_description": attr.get("entityDescription", ""),
+                    "entity_description": attr.get("contextDescription", ""),
                 }
             )
         except (KeyError, TypeError, ValueError) as e:
@@ -128,11 +128,34 @@ def reformat_geographic_coverage_elements(
     geos: List[Dict[str, Any]],
 ) -> List[Dict[str, Any]]:
     """
-    Stub: Transform geographic coverage elements to the format expected by the geographic coverage
-    recommender. For now, returns input unchanged.
+    Transform geographic coverage elements to include coordinates and other relevant fields
+    from the canonical element object.
 
     :param geos: List of geographic coverage dictionaries
-    :return: List of geographic coverage dictionaries (unchanged)
+    :return: List of geographic coverage dictionaries with extracted fields
     """
-    logger.info("Reformatting %d geographic coverage elements (stub).", len(geos))
-    return geos
+    reformatted: List[Dict[str, Any]] = []
+    for geo in geos:
+        try:
+            reformatted.append(
+                {
+                    "id": geo.get("id"),
+                    "name": geo.get("name"),
+                    "description": geo.get("description"),
+                    "context": geo.get("context"),
+                    "west": geo.get("west"),
+                    "east": geo.get("east"),
+                    "north": geo.get("north"),
+                    "south": geo.get("south"),
+                    "altitudeMinimum": geo.get("altitudeMinimum"),
+                    "altitudeMaximum": geo.get("altitudeMaximum"),
+                    "altitudeUnits": geo.get("altitudeUnits"),
+                    "outerGRing": geo.get("outerGRing"),
+                    "exclusionGRing": geo.get("exclusionGRing"),
+                }
+            )
+        except (KeyError, TypeError, ValueError) as e:
+            logger.exception("Error reformatting geographic coverage element: %s", e)
+
+    logger.info("Reformatted %d geographic coverage elements.", len(reformatted))
+    return reformatted

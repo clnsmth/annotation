@@ -13,6 +13,7 @@ from webapp.utils.utils import (
     extract_ontology,
     merge_recommender_results,
     reformat_attribute_elements,
+    reformat_geographic_coverage_elements,
 )
 from webapp.models.mock_objects import (
     MOCK_RAW_ATTRIBUTE_RECOMMENDATIONS_BY_FILE,
@@ -211,6 +212,9 @@ def recommend_for_geographic_coverage(
 
     logger = daiquiri.getLogger(__name__)
     final_output: List[Dict[str, Any]] = []
+
+    # Apply canonical backend transformation
+    geos = reformat_geographic_coverage_elements(geos)
 
     for geo in geos:
         geo_id = geo.get("id")
