@@ -9,7 +9,11 @@ from typing import List, Dict, Any
 import smtplib
 import requests
 from webapp.config import Config
-from webapp.utils.utils import merge_recommender_results, reformat_attribute_elements
+from webapp.utils.utils import (
+    extract_ontology,
+    merge_recommender_results,
+    reformat_attribute_elements,
+)
 from webapp.models.mock_objects import (
     MOCK_RAW_ATTRIBUTE_RECOMMENDATIONS_BY_FILE,
     MOCK_GEOGRAPHICCOVERAGE_RECOMMENDATIONS,
@@ -165,13 +169,17 @@ def recommend_for_geographic_coverage(
     geos: List[Dict[str, Any]], request_id: str | None = None
 ) -> List[Dict[str, Any]]:
     """
-    Stub recommender for geographic coverage elements.
+    Recommender for geographic coverage elements.
+
+    When USE_MOCK_RECOMMENDATIONS is True, returns pre-built mock data.
+    Otherwise, converts each geographic coverage element to GeoJSON,
+    resolves via geoenv data sources, and formats the mapped ENVO terms
+    as annotation recommendations.
 
     :param geos: List of geographic coverage dictionaries
-    :param request_id: The request UUID to include in each recommendation object
-    :return: Mock recommendations if enabled, otherwise an empty list
+    :param request_id: The request UUID to include in each recommendation
+    :return: List of recommendation results per geographic coverage
     """
-    # pylint: disable=unused-argument
     if Config.USE_MOCK_RECOMMENDATIONS:
         import copy
 
@@ -187,4 +195,79 @@ def recommend_for_geographic_coverage(
                 results.append(item_copy)
 
         return results
-    return []
+
+    # --- Real geoenv path ---
+    import asyncio
+    import json
+    import daiquiri
+    from geoenv.geometry import Geometry
+    from geoenv.resolver import Resolver
+    from geoenv.data_sources import (
+        WorldTerrestrialEcosystems,
+        EcologicalMarineUnits,
+        EcologicalCoastalUnits,
+    )
+    from webapp.utils.eml_geo import GeographicCoverage
+
+    logger = daiquiri.getLogger(__name__)
+    final_output: List[Dict[str, Any]] = []
+
+    for geo in geos:
+        geo_id = geo.get("id")
+        entry: Dict[str, Any] = {"id": geo_id, "recommendations": []}
+
+        try:
+            # Convert EML geographic coverage to GeoJSON
+            geo_cov = GeographicCoverage(geo)
+            geojson_str = geo_cov.to_geojson_geometry()
+            if not geojson_str:
+                logger.warning("No GeoJSON geometry for geo coverage '%s'.", geo_id)
+                final_output.append(entry)
+                continue
+
+            geojson_dict = json.loads(geojson_str)
+            geometry = Geometry(geojson_dict)
+
+            # Resolve with all available data sources
+            data_sources = [
+                WorldTerrestrialEcosystems(),
+                EcologicalMarineUnits(),
+                EcologicalCoastalUnits(),
+            ]
+            resolver = Resolver(data_sources)
+            response = asyncio.run(resolver.resolve(geometry))
+
+            # Parse mapped properties from the response
+            seen_uris: set = set()
+            environments = response.data.get("properties", {}).get("environment", [])
+            for env in environments:
+                for mapped in env.get("mappedProperties", []):
+                    uri = mapped.get("uri")
+                    label = mapped.get("label")
+                    if not uri or not label:
+                        continue
+                    if uri in seen_uris:
+                        continue
+                    seen_uris.add(uri)
+                    entry["recommendations"].append(
+                        {
+                            "label": label,
+                            "uri": uri,
+                            "ontology": extract_ontology(uri),
+                            "confidence": 0.90,
+                            "description": "",
+                            "propertyLabel": ("broad-scale environmental context"),
+                            "propertyUri": (
+                                "https://genomicsstandardsconsortium.github.io"
+                                "/mixs/0000012/"
+                            ),
+                            "request_id": request_id,
+                        }
+                    )
+
+        except Exception as e:
+            logger.exception("Error resolving geo coverage '%s': %s", geo_id, e)
+
+        final_output.append(entry)
+
+    return final_output
