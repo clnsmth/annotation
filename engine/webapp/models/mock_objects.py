@@ -2501,6 +2501,15 @@ MOCK_FRONTEND_PAYLOAD = {
             "name": "Location",
             "description": "A series of small lakes within the Cedar River Municipal Watershed in the Puget Sound region of western Washington State, USA",
             "context": "Geographic Coverage",
+            "west": -121.894046,
+            "east": -121.884546,
+            "north": 47.3991,
+            "south": 47.396387,
+            "altitudeMinimum": None,
+            "altitudeMaximum": None,
+            "altitudeUnits": None,
+            "outerGRing": None,
+            "exclusionGRing": None,
         }
     ],
 }

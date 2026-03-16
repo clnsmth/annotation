@@ -256,6 +256,7 @@ class EmlEntity:
     object_name: Optional[str]
     context: str
     context_desc: Optional[str]
+    geo_fields: Optional[dict] = None
 
 
 def _find_annotatable_entities(
@@ -333,6 +334,8 @@ def _find_annotatable_entities(
         path_geo = f"dataset/coverage/geographicCoverage[{geo_idx}]"
         geo_id = _make_id(geo_xml_id, path_geo)
 
+        geo_fields = _extract_geo_fields(geo_node)
+
         yield EmlEntity(
             node=geo_node,
             element_id=geo_id,
@@ -343,7 +346,64 @@ def _find_annotatable_entities(
             object_name=None,
             context="Geographic Coverage",
             context_desc=None,
+            geo_fields=geo_fields,
         )
+
+
+def _float_or_none(node: etree._Element, local_name: str) -> Optional[float]:
+    """Extract a float value from a descendant element, or None."""
+    val = _text(node, local_name)
+    if val:
+        try:
+            return float(val)
+        except (ValueError, TypeError):
+            return None
+    return None
+
+
+def _extract_geo_fields(geo_node: etree._Element) -> dict:
+    """Extract geographic coverage fields from a geographicCoverage node.
+
+    Returns a dict with bounding coordinates, altitude data, and gRing
+    polygon data suitable for downstream GeoJSON conversion.
+    """
+    west = _float_or_none(geo_node, "westBoundingCoordinate")
+    east = _float_or_none(geo_node, "eastBoundingCoordinate")
+    north = _float_or_none(geo_node, "northBoundingCoordinate")
+    south = _float_or_none(geo_node, "southBoundingCoordinate")
+
+    alt_min = _float_or_none(geo_node, "altitudeMinimum")
+    alt_max = _float_or_none(geo_node, "altitudeMaximum")
+    alt_units = _text(geo_node, "altitudeUnits") or None
+
+    # gRing polygon data
+    outer_gring = None
+    for el in geo_node.iter():
+        if _strip_ns(el.tag) == "datasetGPolygonOuterGRing":
+            for child in el:
+                if _strip_ns(child.tag) == "gRing":
+                    outer_gring = (child.text or "").strip() or None
+            break
+
+    exclusion_gring = None
+    for el in geo_node.iter():
+        if _strip_ns(el.tag) == "datasetGPolygonExclusionGRing":
+            for child in el:
+                if _strip_ns(child.tag) == "gRing":
+                    exclusion_gring = (child.text or "").strip() or None
+            break
+
+    return {
+        "west": west,
+        "east": east,
+        "north": north,
+        "south": south,
+        "altitudeMinimum": alt_min,
+        "altitudeMaximum": alt_max,
+        "altitudeUnits": alt_units,
+        "outerGRing": outer_gring,
+        "exclusionGRing": exclusion_gring,
+    }
 
 
 def parse_eml(xml_string: str) -> list[dict[str, Any]]:
@@ -411,6 +471,7 @@ def parse_eml(xml_string: str) -> list[dict[str, Any]]:
             detached_annotations = detached.get(entity.element_id, [])
             combined = direct_annotations + detached_annotations
 
+            geo_extra = entity.geo_fields or {}
             elements.append(
                 {
                     "id": entity.element_id,
@@ -424,6 +485,7 @@ def parse_eml(xml_string: str) -> list[dict[str, Any]]:
                     "currentAnnotations": combined,
                     "recommendedAnnotations": [],
                     "status": "APPROVED" if combined else "PENDING",
+                    **geo_extra,
                 }
             )
         else:
