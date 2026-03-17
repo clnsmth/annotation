@@ -257,3 +257,7 @@ engine/proposals.jsonl
 /studio/blob-report/
 /studio/playwright/.cache/
 /studio/playwright/.auth/
+
+# Pycharm
+.idea/
+*.iml
