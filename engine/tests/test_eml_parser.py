@@ -307,6 +307,51 @@ class TestExportEml:
             lat_re["currentAnnotations"][0]["uri"] == "http://qudt.org/vocab/unit/DEG"
         )
 
+    def test_other_entity_annotation_placed_before_entity_type(self):
+        """
+        Annotation added to an otherEntity must appear before <entityType>
+        in the exported XML (EML schema requires this ordering).
+        """
+        eml = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<eml:eml xmlns:eml="https://eml.ecoinformatics.org/eml-2.2.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="https://eml.ecoinformatics.org/eml-2.2.0 https://eml.ecoinformatics.org/eml-2.2.0/eml.xsd"
+  packageId="test.oe.1">
+  <dataset>
+    <title>OtherEntity Test</title>
+    <otherEntity id="oe-1">
+      <entityName>my_doc.pdf</entityName>
+      <physical>
+        <objectName>my_doc.pdf</objectName>
+      </physical>
+      <entityType>application/pdf</entityType>
+    </otherEntity>
+  </dataset>
+</eml:eml>
+"""
+        elements = parse_eml(eml)
+        oe = next(e for e in elements if e["type"] == "OTHERENTITY")
+        oe["currentAnnotations"] = [
+            {
+                "label": "Document",
+                "uri": "http://purl.obolibrary.org/obo/IAO_0000310",
+                "ontology": "IAO",
+                "confidence": 1.0,
+                "propertyLabel": "is about",
+                "propertyUri": "http://purl.obolibrary.org/obo/IAO_0000136",
+            }
+        ]
+
+        updated_xml = export_eml(eml, elements)
+
+        anno_pos = updated_xml.index("<annotation>")
+        entity_type_pos = updated_xml.index("<entityType>")
+        physical_pos = updated_xml.index("<physical>")
+        assert physical_pos < anno_pos < entity_type_pos, (
+            "annotation must appear after <physical> and before <entityType>"
+        )
+
     def test_export_rejects_malformed_xml(self):
         """export_eml must raise ValueError for malformed input XML."""
         with pytest.raises(ValueError, match="Invalid XML"):

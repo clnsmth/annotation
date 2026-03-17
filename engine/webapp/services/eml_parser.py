@@ -663,6 +663,7 @@ def export_eml(xml_string: str, elements: list[dict[str, Any]]) -> str:
                     anno_el,
                     "attributeList",
                     "constraint",
+                    "entityType",
                     "spatialReference",
                     "geospatial",
                     "geometry",
