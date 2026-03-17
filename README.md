@@ -29,6 +29,8 @@ annotation/
 
 See [`engine/README.md`](engine/README.md) and
 [`studio/README.md`](studio/README.md) for component-specific documentation.
+For production server setup, see the
+[Deployment Guide](docs/deployment.md).
 
 ## Getting Started
 
