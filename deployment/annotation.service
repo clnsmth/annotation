@@ -1,0 +1,24 @@
+[Unit]
+Description=Uvicorn service for annotation-engine (FastAPI)
+After=network.target
+
+[Service]
+User=pasta
+WorkingDirectory=/home/pasta/annotation/engine
+
+# Pixi-managed uvicorn; keep it bound to loopback only.
+ExecStart=/home/pasta/annotation/engine/.pixi/envs/default/bin/uvicorn webapp.run:app --host 127.0.0.1 --port 8000
+
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+Restart=always
+Type=simple
+
+# Optional: send logs to journald (default behavior). View with:
+#   journalctl -u annotation-engine -f
+
+[Install]
+WantedBy=multi-user.target
