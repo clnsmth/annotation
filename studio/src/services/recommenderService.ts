@@ -12,7 +12,7 @@ export class RecommenderService {
    */
   async getRecommendations(elements: AnnotatableElement[]): Promise<Map<string, OntologyTerm[]>> {
     // Group elements by type for the backend coordinator
-    const groupedPayload: Record<string, Record<string, string | undefined>[]> = {};
+    const groupedPayload: Record<string, Record<string, string | number | null | undefined>[]> = {};
     let totalCount = 0;
 
     elements.forEach(e => {
@@ -26,14 +26,28 @@ export class RecommenderService {
         groupedPayload[key] = [];
       }
 
-      groupedPayload[key].push({
+      const payloadItem: Record<string, string | number | null | undefined> = {
         id: e.id,
         name: e.name,
         description: e.description,
         context: e.context,
         objectName: e.objectName, // Include the physical file name if available (e.g. for attributes)
         entityDescription: e.contextDescription // Include context description (e.g. Entity Description for attributes)
-      });
+      };
+
+      if (e.type === 'COVERAGE') {
+        if (e.west !== undefined) payloadItem.west = e.west;
+        if (e.east !== undefined) payloadItem.east = e.east;
+        if (e.north !== undefined) payloadItem.north = e.north;
+        if (e.south !== undefined) payloadItem.south = e.south;
+        if (e.altitudeMinimum !== undefined) payloadItem.altitudeMinimum = e.altitudeMinimum;
+        if (e.altitudeMaximum !== undefined) payloadItem.altitudeMaximum = e.altitudeMaximum;
+        if (e.altitudeUnits !== undefined) payloadItem.altitudeUnits = e.altitudeUnits;
+        if (e.outerGRing !== undefined) payloadItem.outerGRing = e.outerGRing;
+        if (e.exclusionGRing !== undefined) payloadItem.exclusionGRing = e.exclusionGRing;
+      }
+
+      groupedPayload[key].push(payloadItem);
       totalCount++;
     });
 
