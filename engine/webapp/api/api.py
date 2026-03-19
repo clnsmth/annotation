@@ -205,4 +205,83 @@ def export_audit(request: AuditRequest) -> Response:
         ) from e
 
 
+@router.post("/api/documents/auto-annotate")
+def auto_annotate_document(file: UploadFile = File(...)) -> Response:
+    """
+    Accepts an uploaded EML file, parses it, automatically selects the best recommendations
+    for attributes and all recommendations for geographic coverages, and returns the
+    annotated EML XML.
+
+    :param file: Uploaded EML XML file (multipart/form-data)
+    :return: Plain-text XML response with annotations applied
+    :raises HTTPException: 422 if the EML version is unsupported or the XML is malformed
+    """
+    try:
+        contents = file.file.read()
+        xml_string = contents.decode("utf-8", errors="replace")
+        elements = parse_eml(xml_string)
+        logger.info(
+            "auto_annotate_document: parsed %d elements from '%s'.",
+            len(elements),
+            file.filename,
+        )
+
+        # Filter elements
+        attributes = [el for el in elements if el.get("type") == "ATTRIBUTE"]
+        coverages = [el for el in elements if el.get("type") == "COVERAGE"]
+
+        request_id = str(uuid.uuid4())
+
+        # Get recommendations
+        recommended_attributes = []
+        if attributes:
+            recommended_attributes = recommend_for_attribute(
+                attributes, request_id=request_id
+            )
+
+        recommended_coverages = []
+        if coverages:
+            recommended_coverages = recommend_for_geographic_coverage(
+                coverages, request_id=request_id
+            )
+
+        # Create dictionaries for fast lookup by element ID
+        attr_recs_by_id = {rec.get("id"): rec for rec in recommended_attributes}
+        cov_recs_by_id = {rec.get("id"): rec for rec in recommended_coverages}
+
+        # Apply recommendations
+        for el in elements:
+            el_id = el.get("id")
+            if el.get("type") == "ATTRIBUTE":
+                rec_data = attr_recs_by_id.get(el_id)
+                if rec_data and rec_data.get("recommendations"):
+                    # Select ONLY the highest ranked recommendation
+                    best_rec = rec_data["recommendations"][0]
+                    el.setdefault("currentAnnotations", []).append(best_rec)
+                    el["status"] = "APPROVED"
+            elif el.get("type") == "COVERAGE":
+                rec_data = cov_recs_by_id.get(el_id)
+                if rec_data and rec_data.get("recommendations"):
+                    # Select ALL available recommendations
+                    el.setdefault("currentAnnotations", []).extend(
+                        rec_data["recommendations"]
+                    )
+                    el["status"] = "APPROVED"
+
+        # Export annotated EML
+        updated_xml = export_eml(xml_string, elements)
+        logger.info("auto_annotate_document: exported auto-annotated EML.")
+        return Response(content=updated_xml, media_type="application/xml")
+
+    except ValueError as e:
+        logger.warning("auto_annotate_document validation error: %s", e)
+        raise HTTPException(status_code=422, detail=str(e)) from e
+    except Exception as e:
+        logger.exception("auto_annotate_document unexpected error: %s", e)
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error auto-annotating EML document.",
+        ) from e
+
+
 __all__ = ["router"]

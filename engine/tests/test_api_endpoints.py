@@ -3,6 +3,7 @@ Tests for API endpoints: health check, proposals, and recommendations edge cases
 """
 
 from typing import Any, Dict
+from unittest.mock import patch
 
 import pytest
 
@@ -93,3 +94,33 @@ def test_recommendations_unrecognized_keys_only(client: Any) -> None:
     response = client.post("/api/recommendations", json=payload)
     assert response.status_code == 200
     assert response.json() == []
+
+
+@pytest.mark.usefixtures("client")
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", True)
+def test_auto_annotate_document(client: Any) -> None:
+    """
+    Test that POST /api/documents/auto-annotate accepts an EML file,
+    processes it through the recommendation pipeline, and returns updated XML.
+    """
+    from pathlib import Path
+
+    # Use the existing example_eml.xml fixture
+    fixture_path = Path(__file__).parent / "fixtures" / "example_eml.xml"
+    with open(fixture_path, "rb") as f:
+        file_content = f.read()
+
+    response = client.post(
+        "/api/documents/auto-annotate",
+        files={"file": ("example_eml.xml", file_content, "application/xml")},
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/xml")
+
+    # Simple check to ensure the returned content is non-empty XML
+    xml_text = response.text
+    assert "<?xml" in xml_text or "<eml:eml" in xml_text
+
+    # Could additionally check if "annotation" tags are present or increased,
+    # but that depends on the mock recommender response in relation to this file.

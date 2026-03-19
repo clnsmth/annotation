@@ -81,18 +81,24 @@ class TestToGeoJsonGeometry:
         assert coords[0] == coords[-1]  # Closed ring
 
     def test_altitude_as_z_coordinate(self):
-        geo = GeographicCoverage(
-            {
-                "west": -121.8,
-                "east": -121.8,
-                "north": 47.4,
-                "south": 47.4,
-                "altitudeMinimum": 100,
-                "altitudeMaximum": 200,
-                "altitudeUnits": "meter",
-            }
-        )
-        result = geo.to_geojson_geometry()
+        import pytest
+
+        with pytest.warns(
+            UserWarning, match="Altitude minimum and maximum are different"
+        ):
+            geo = GeographicCoverage(
+                {
+                    "west": -121.8,
+                    "east": -121.8,
+                    "north": 47.4,
+                    "south": 47.4,
+                    "altitudeMinimum": 100,
+                    "altitudeMaximum": 200,
+                    "altitudeUnits": "meter",
+                }
+            )
+            result = geo.to_geojson_geometry()
+
         parsed = json.loads(result)
         assert parsed["type"] == "Point"
         # Average altitude = 150
