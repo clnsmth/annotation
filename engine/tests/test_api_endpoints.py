@@ -3,6 +3,7 @@ Tests for API endpoints: health check, proposals, and recommendations edge cases
 """
 
 from typing import Any, Dict
+from unittest.mock import patch
 
 import pytest
 
@@ -96,6 +97,7 @@ def test_recommendations_unrecognized_keys_only(client: Any) -> None:
 
 
 @pytest.mark.usefixtures("client")
+@patch("webapp.services.core.Config.USE_MOCK_RECOMMENDATIONS", True)
 def test_auto_annotate_document(client: Any) -> None:
     """
     Test that POST /api/documents/auto-annotate accepts an EML file,
