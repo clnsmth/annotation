@@ -206,7 +206,7 @@ def export_audit(request: AuditRequest) -> Response:
 
 
 @router.post("/api/documents/auto-annotate")
-async def auto_annotate_document(file: UploadFile = File(...)) -> Response:
+def auto_annotate_document(file: UploadFile = File(...)) -> Response:
     """
     Accepts an uploaded EML file, parses it, automatically selects the best recommendations
     for attributes and all recommendations for geographic coverages, and returns the
@@ -217,7 +217,7 @@ async def auto_annotate_document(file: UploadFile = File(...)) -> Response:
     :raises HTTPException: 422 if the EML version is unsupported or the XML is malformed
     """
     try:
-        contents = await file.read()
+        contents = file.file.read()
         xml_string = contents.decode("utf-8", errors="replace")
         elements = parse_eml(xml_string)
         logger.info(
