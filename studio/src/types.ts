@@ -30,6 +30,17 @@ export interface AnnotatableElement {
   currentAnnotations: OntologyTerm[];
   recommendedAnnotations: OntologyTerm[];
   status: AnnotationStatus;
+
+  // Geographic coverage specific fields appended by backend
+  west?: number | null;
+  east?: number | null;
+  north?: number | null;
+  south?: number | null;
+  altitudeMinimum?: number | null;
+  altitudeMaximum?: number | null;
+  altitudeUnits?: string | null;
+  outerGRing?: string | null;
+  exclusionGRing?: string | null;
 }
 
 export interface EmlData {
