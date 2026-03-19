@@ -257,13 +257,13 @@ def auto_annotate_document(file: UploadFile = File(...)) -> Response:
                 if rec_data and rec_data.get("recommendations"):
                     # Select ONLY the highest ranked recommendation
                     best_rec = rec_data["recommendations"][0]
-                    el["currentAnnotations"] = [best_rec]
+                    el.setdefault("currentAnnotations", []).append(best_rec)
                     el["status"] = "APPROVED"
             elif el.get("type") == "COVERAGE":
                 rec_data = cov_recs_by_id.get(el_id)
                 if rec_data and rec_data.get("recommendations"):
                     # Select ALL available recommendations
-                    el["currentAnnotations"] = rec_data["recommendations"]
+                    el.setdefault("currentAnnotations", []).extend(rec_data["recommendations"])
                     el["status"] = "APPROVED"
 
         # Export annotated EML
