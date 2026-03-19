@@ -5,6 +5,7 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.133",
     "uvicorn>=0.41",
+    "gunicorn>=23.0",
     "pydantic>=2.12",
     "httpx>=0.28",
     "requests>=2.32",
@@ -26,6 +27,7 @@ platforms = ["linux-64", "osx-arm64", "linux-aarch64"]
 python = "3.13.*"
 fastapi = ">=0.133"
 uvicorn = ">=0.41"
+gunicorn = ">=23.0"
 pydantic = ">=2.12"
 httpx = ">=0.28"
 requests = ">=2.32"
