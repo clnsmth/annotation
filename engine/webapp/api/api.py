@@ -263,7 +263,9 @@ def auto_annotate_document(file: UploadFile = File(...)) -> Response:
                 rec_data = cov_recs_by_id.get(el_id)
                 if rec_data and rec_data.get("recommendations"):
                     # Select ALL available recommendations
-                    el.setdefault("currentAnnotations", []).extend(rec_data["recommendations"])
+                    el.setdefault("currentAnnotations", []).extend(
+                        rec_data["recommendations"]
+                    )
                     el["status"] = "APPROVED"
 
         # Export annotated EML
