@@ -282,7 +282,7 @@ def test_recommend_for_geographic_coverage_real_geoenv() -> None:
                     "column_name": "Latitude",
                     "column_description": "Latitude of collection",
                     "object_name": "SurveyResults.csv",
-                    "entity_name": "SurveyResults.csv",
+                    "entity_name": "SurveyResults",
                     "entity_description": "Table contains survey information and the counts of "
                     "the number of egg masses for each species during that "
                     "survey.",
