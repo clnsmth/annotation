@@ -31,6 +31,8 @@ def extract_ontology(uri: Optional[str]) -> str:
         return match_ecso.group(1)
     if "dwc/terms" in uri:
         return "DWC"
+    if "oboe" in uri.lower():
+        return "OBOE"
     logger.warning("extract_ontology could not parse ontology from uri: %s", uri)
     return "UNKNOWN"
 

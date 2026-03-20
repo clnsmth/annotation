@@ -389,6 +389,10 @@ def test_recommendations_endpoint_snapshot(
         ("http://purl.obolibrary.org/obo/IAO_0000578", "IAO"),
         ("http://rs.tdwg.org/dwc/terms/decimalLatitude", "DWC"),
         ("http://purl.dataone.org/odo/ECSO_00002565", "ECSO"),
+        (
+            "http://ecoinformatics.org/oboe/oboe.1.2/oboe-characteristics.owl#MassSpecificCount",
+            "OBOE",
+        ),
         ("", "UNKNOWN"),
         (None, "UNKNOWN"),
         ("http://example.com/other/THING_12345", "UNKNOWN"),
