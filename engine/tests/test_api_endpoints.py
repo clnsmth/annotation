@@ -123,9 +123,17 @@ def test_auto_annotate_document(client: Any) -> None:
     assert "<?xml" in xml_text or "<eml:eml" in xml_text
 
     # Assert legacy annotations originally in example_eml.xml survived
-    assert "http://qudt.org/vocab/unit/DEG" in xml_text, "Legacy attribute annotation lost"
-    assert "http://purl.obolibrary.org/obo/ENVO_00000000" in xml_text, "Legacy coverage annotation lost"
+    assert "http://qudt.org/vocab/unit/DEG" in xml_text, (
+        "Legacy attribute annotation lost"
+    )
+    assert "http://purl.obolibrary.org/obo/ENVO_00000000" in xml_text, (
+        "Legacy coverage annotation lost"
+    )
 
     # Assert new AI recommendations were successfully aggregated
-    assert "http://purl.dataone.org/odo/ECSO_00002130" in xml_text, "New attribute recommendation missing"
-    assert "http://purl.obolibrary.org/obo/ENVO_00000020" in xml_text, "New coverage recommendation missing"
+    assert "http://purl.dataone.org/odo/ECSO_00002130" in xml_text, (
+        "New attribute recommendation missing"
+    )
+    assert "http://purl.obolibrary.org/obo/ENVO_00000020" in xml_text, (
+        "New coverage recommendation missing"
+    )
