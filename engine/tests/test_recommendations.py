@@ -271,7 +271,7 @@ def test_recommend_for_geographic_coverage_real_geoenv() -> None:
                     "description": "Latitude of collection",
                     "context": "SurveyResults",
                     "objectName": "SurveyResults.csv",
-                    "entityDescription": "Table contains survey information and the counts of "
+                    "contextDescription": "Table contains survey information and the counts of "
                     "the number of egg masses for each species during that "
                     "survey.",
                 }

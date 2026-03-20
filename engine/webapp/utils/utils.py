@@ -114,11 +114,8 @@ def reformat_attribute_elements(
                     "column_name": attr.get("name", ""),
                     "column_description": attr.get("description", ""),
                     "object_name": attr.get("objectName", ""),
-                    "entity_name": attr.get("entityName")
-                    or attr.get("context")
-                    or attr.get("objectName", ""),
-                    "entity_description": attr.get("entityDescription")
-                    or attr.get("contextDescription", ""),
+                    "entity_name": attr.get("context") or attr.get("objectName", ""),
+                    "entity_description": attr.get("contextDescription", ""),
                 }
             )
         except (KeyError, TypeError, ValueError) as e:
