@@ -16,6 +16,10 @@ from webapp.services.core import (
     recommend_for_attribute,
     recommend_for_geographic_coverage,
 )
+from webapp.services.selection_strategies import (
+    select_attribute_recommendations,
+    select_coverage_recommendations,
+)
 from webapp.services.eml_parser import parse_eml, export_eml
 from webapp.services.audit import generate_audit_report
 from webapp.models.log_selection import LogSelection
@@ -254,19 +258,12 @@ def auto_annotate_document(file: UploadFile = File(...)) -> Response:
             el_id = el.get("id")
             if el.get("type") == "ATTRIBUTE":
                 rec_data = attr_recs_by_id.get(el_id)
-                if rec_data and rec_data.get("recommendations"):
-                    # Select ONLY the highest ranked recommendation
-                    best_rec = rec_data["recommendations"][0]
-                    el.setdefault("currentAnnotations", []).append(best_rec)
-                    el["status"] = "APPROVED"
+                if rec_data:
+                    select_attribute_recommendations(rec_data, el)
             elif el.get("type") == "COVERAGE":
                 rec_data = cov_recs_by_id.get(el_id)
-                if rec_data and rec_data.get("recommendations"):
-                    # Select ALL available recommendations
-                    el.setdefault("currentAnnotations", []).extend(
-                        rec_data["recommendations"]
-                    )
-                    el["status"] = "APPROVED"
+                if rec_data:
+                    select_coverage_recommendations(rec_data, el)
 
         # Export annotated EML
         updated_xml = export_eml(xml_string, elements)

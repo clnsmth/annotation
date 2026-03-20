@@ -265,6 +265,10 @@
           <northBoundingCoordinate>47.3991</northBoundingCoordinate>
           <southBoundingCoordinate>47.396387</southBoundingCoordinate>
         </boundingCoordinates>
+        <annotation>
+          <propertyURI label="has attribute">http://ecoinformatics.org/oboe/oboe.1.2/oboe-core.owl#hasAttribute</propertyURI>
+          <valueURI label="legacy geo">http://purl.obolibrary.org/obo/ENVO_00000000</valueURI>
+        </annotation>
       </geographicCoverage>
       <temporalCoverage>
         <singleDateTime>

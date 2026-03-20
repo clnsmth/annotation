@@ -32,7 +32,7 @@ export class RecommenderService {
         description: e.description,
         context: e.context,
         objectName: e.objectName, // Include the physical file name if available (e.g. for attributes)
-        entityDescription: e.contextDescription // Include context description (e.g. Entity Description for attributes)
+        contextDescription: e.contextDescription // Include context description without mapping to deprecated keys
       };
 
       if (e.type === 'COVERAGE') {

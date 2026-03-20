@@ -389,7 +389,7 @@ export const EXAMPLE_EML_XML = `<eml:eml xmlns:eml="https://eml.ecoinformatics.o
     <dataTable id="24632bb8dbdace8be4693baf5c9e4b97" scope="document"
       system="https://pasta.edirepository.org">
       <entityName>SurveyResults</entityName>
-      <entityDescription>Table contains survey information and the counts of the number of egg masses for each species during that survey.</entityDescription>
+      <contextDescription>Table contains survey information and the counts of the number of egg masses for each species during that survey.</contextDescription>
       <physical>
         <objectName>SurveyResults.csv</objectName>
         <size unit="byte">38958</size>
@@ -955,7 +955,7 @@ export const EXAMPLE_EML_XML = `<eml:eml xmlns:eml="https://eml.ecoinformatics.o
     <dataTable id="9f81741eef929975361d53fe07d370b9" scope="document"
       system="https://pasta.edirepository.org">
       <entityName>EggMasses</entityName>
-      <entityDescription>Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.</entityDescription>
+      <contextDescription>Contains fine-scale information on groups of egg masses encountered during a survey, including GPS data. These data were only collected from 2021 onward, and were not collected for every survey--SurveyResults has the authoritative counts of egg masses for each survey.</contextDescription>
       <physical>
         <objectName>EggMasses.csv</objectName>
         <size unit="byte">66941</size>
@@ -1165,7 +1165,7 @@ export const EXAMPLE_EML_XML = `<eml:eml xmlns:eml="https://eml.ecoinformatics.o
     <otherEntity id="befe3d845aea4510048251bd0079e3de" scope="document"
       system="https://pasta.edirepository.org">
       <entityName>14LakesRiparianHabitatRestorationProjectAsBuilt2012</entityName>
-      <entityDescription>14 Lakes Riparian Habitat Restoration Project As-Built Document referenced in SurveyReport_2003_2014 amphibian monitoring survey report. Provided for greater context regarding habitat management in the project location.</entityDescription>
+      <contextDescription>14 Lakes Riparian Habitat Restoration Project As-Built Document referenced in SurveyReport_2003_2014 amphibian monitoring survey report. Provided for greater context regarding habitat management in the project location.</contextDescription>
       <physical>
         <objectName>14LakesRiparianHabitatRestorationProjectAsBuilt2012.pdf</objectName>
         <size unit="byte">319135</size>
