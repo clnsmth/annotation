@@ -10,17 +10,17 @@ test.describe('Annotation Studio End-to-End', () => {
 
         // 3. Toggle AI Recommendations On
         // Mock targets endpoint since backend is not running
-        await page.route('http://localhost:8000/api/documents/targets', async route => {
+        await page.route('http://localhost:8001/api/documents/targets', async route => {
             await route.fulfill({ json: mockTargets });
         });
 
         // Mock export endpoint
-        await page.route('http://localhost:8000/api/documents/export', async route => {
+        await page.route('http://localhost:8001/api/documents/export', async route => {
             await route.fulfill({ body: '<eml:eml><dataset><title>Export Mock</title></dataset></eml:eml>' });
         });
 
         // First, mock the backend response since we aren't running the fastAPI engine in E2E
-        await page.route('http://localhost:8000/api/recommendations', async route => {
+        await page.route('http://localhost:8001/api/recommendations', async route => {
             const json = [
                 {
                     id: 'cfe0601b-e76b-4f34-8a5a-655db3b0491c', // ID of SurveyID attribute in example_eml.xml
@@ -107,7 +107,7 @@ test.describe('Annotation Studio End-to-End', () => {
         await page.getByPlaceholder('Annotation URI').fill('http://example.com/e2e');
 
         // 8a. Test Suggest New Term Modal
-        await page.route('http://localhost:8000/api/proposals', async route => {
+        await page.route('http://localhost:8001/api/proposals', async route => {
             await route.fulfill({ status: 200, json: { status: 'success' } });
         });
         await page.getByRole('button', { name: 'Suggest New Term' }).click();

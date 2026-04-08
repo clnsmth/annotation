@@ -344,7 +344,7 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
     };
 
     const blob = new Blob([JSON.stringify(logData)], { type: 'application/json' });
-    navigator.sendBeacon('http://localhost:8000/api/log-selection', blob);
+    navigator.sendBeacon('http://localhost:8001/api/log-selection', blob);
   };
 
   const addAnnotation = (term: OntologyTerm) => {

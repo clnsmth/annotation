@@ -31,7 +31,7 @@ To start the FastAPI server (for development):
 pixi run serve
 ```
 
-The API will be available at http://localhost:8000
+The API will be available at http://localhost:8001
 
 ### Running Tests
 

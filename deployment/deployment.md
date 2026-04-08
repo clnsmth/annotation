@@ -4,10 +4,10 @@ This guide walks through deploying **Annotation Studio & Engine** on Ubuntu 22.0
 (or newer Ubuntu LTS). The result is:
 
 - **Engine** – FastAPI backend managed by a `systemd` service, listening on
-  `127.0.0.1:8000` (loopback only).
+  `127.0.0.1:8001` (loopback only).
 - **Studio** – React static build served by **nginx** over HTTPS.
 - **Reverse proxy** – nginx forwards API calls from `https://<your-domain>/api/...`
-  to the Engine on `http://127.0.0.1:8000`.
+  to the Engine on `http://127.0.0.1:8001`.
 
 This guide is written for a common real-world scenario on shared servers:
 
@@ -146,7 +146,7 @@ Confirm the environment is healthy:
 
 ```bash
 pixi run serve &   # start temporarily
-curl http://127.0.0.1:8000/   # should return a JSON response
+curl http://127.0.0.1:8001/   # should return a JSON response
 kill %1            # stop the temporary server
 ```
 
@@ -234,7 +234,7 @@ WorkingDirectory=/home/<deploy-user>/annotation/engine
 ExecStart=/home/<deploy-user>/annotation/engine/.pixi/envs/default/bin/uvicorn \
     webapp.run:app \
     --host 127.0.0.1 \
-    --port 8000
+    --port 8001
 Restart=on-failure
 RestartSec=5
 
@@ -296,7 +296,7 @@ location / {
 # - Internal FastAPI routes are typically /... (no /api prefix)
 # - The trailing slash on proxy_pass strips the /api/ prefix.
 location /api/ {
-    proxy_pass http://127.0.0.1:8000/;
+    proxy_pass http://127.0.0.1:8001/;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -321,7 +321,7 @@ sudo systemctl reload nginx
 ### 9.1 Engine health check (local)
 
 ```bash
-curl http://127.0.0.1:8000/
+curl http://127.0.0.1:8001/
 ```
 
 Expected: a JSON response from the FastAPI application.
