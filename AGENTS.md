@@ -4,16 +4,19 @@ This project consists of two main components:
 1.  **Engine**: A FastAPI backend located in the `engine/` directory.
 2.  **Studio**: A Vite/React frontend located in the `studio/` directory.
 
+Both components are managed by a single root-level `pixi.toml`. Run
+`pixi install` from the repository root to set up all environments.
+
 ## Backend (Engine)
 
 The backend is responsible for the annotation engine logic and email notifications.
 
 ### Environment Setup
-- Use Pixi to manage the environment: `pixi install` (within the `engine/` directory).
+- Use Pixi to manage the environment: `pixi install` (from the repo root).
 - Primary source code is located in `engine/webapp/`.
 
 ### Development & Running
-- **Running the server**: From the `engine/` directory, run:
+- **Running the server**: From the repo root, run:
   ```bash
   pixi run serve
   ```
@@ -27,7 +30,7 @@ The backend is responsible for the annotation engine logic and email notificatio
   pixi run -e dev lint
   pixi run -e dev format
   ```
-- **Testing**: Use `pytest` to run the test suite from the `engine/` directory.
+- **Testing**: Use `pytest` to run the test suite from the repo root.
   ```bash
   pixi run -e dev test
   ```
@@ -37,22 +40,27 @@ The backend is responsible for the annotation engine logic and email notificatio
 The frontend is a React application built with Vite and TypeScript.
 
 ### Environment Setup
-- Use NPM for dependency management: `npm install` (within the `studio/` directory).
+- Pixi manages Node.js and npm. Install JS dependencies with:
+  ```bash
+  pixi run studio-install
+  ```
 
 ### Development & Running
-- **Running the server**: From the `studio/` directory, run:
+- **Running the dev server**: From the repo root, run:
   ```bash
-  npm run dev
+  pixi run studio-dev
   ```
-- **Testing**: Use `vitest` to run the test suite from the `studio/` directory.
+  This automatically runs `npm install` first.
+- **Building**: `pixi run studio-build`
+- **Testing**: Use `vitest` to run the test suite from the repo root.
   ```bash
-  npm test
+  pixi run studio-test
   ```
 
 ### Quality Control
-- **Linting**: Use `eslint` to run checks from the `studio/` directory.
+- **Linting**: Use `eslint` from the repo root.
   ```bash
-  npm run lint
+  pixi run studio-lint
   ```
 
 ## Commit Message Guidelines
@@ -95,11 +103,11 @@ Closes #123
 Before submitting any changes, please ensure you have completed the following:
 
 1.  **Backend Changes**:
-    - [ ] Run `pixi run -e dev lint` and `pixi run -e dev format` from `engine/`.
-    - [ ] Run `pixi run -e dev test` from `engine/` and ensure all tests pass.
+    - [ ] Run `pixi run -e dev lint` and `pixi run -e dev format` from the repo root.
+    - [ ] Run `pixi run -e dev test` from the repo root and ensure all tests pass.
 2.  **Frontend Changes**:
-    - [ ] Run `npm run lint` from `studio/` to ensure no linting warnings exist.
-    - [ ] Manually verify UI changes and functionality by running the Vite development server.
+    - [ ] Run `pixi run studio-lint` from the repo root to ensure no linting warnings exist.
+    - [ ] Manually verify UI changes and functionality by running `pixi run studio-dev`.
 3.  **Documentation**:
     - [ ] Update any relevant comments or documentation if the architecture or configuration changes.
     - [ ] Update this `AGENTS.md` file if any environment setup, tools, or best practices change.
