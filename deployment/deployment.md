@@ -184,10 +184,9 @@ sudo chmod -R u=rwX,g=rX,o=rX /var/www/annotation
 A systemd service keeps the Engine running across reboots and restarts it
 automatically on failure.
 
-### 7.1 Find the Pixi-managed uvicorn binary
-
+### 7.1 Find the Pixi-managed gunicorn binary
 ```bash
-ls /home/<deploy-user>/annotation/engine/.pixi/envs/default/bin/uvicorn
+ls /home/<deploy-user>/annotation/engine/.pixi/envs/default/bin/gunicorn
 ```
 
 ### 7.2 Create the service file
@@ -200,17 +199,18 @@ Paste the following, replacing `<deploy-user>`:
 
 ```ini
 [Unit]
-Description=Annotation Engine (FastAPI / Uvicorn)
+Description=Annotation Engine (FastAPI / Gunicorn)
 After=network.target
 
 [Service]
 Type=simple
 User=<deploy-user>
 WorkingDirectory=/home/<deploy-user>/annotation/engine
-ExecStart=/home/<deploy-user>/annotation/engine/.pixi/envs/default/bin/uvicorn \
+ExecStart=/home/<deploy-user>/annotation/engine/.pixi/envs/default/bin/gunicorn \
     webapp.run:app \
-    --host 127.0.0.1 \
-    --port 8001
+    -w 4 \
+    -k uvicorn.workers.UvicornWorker \
+    --bind 127.0.0.1:8001
 Restart=on-failure
 RestartSec=5
 
