@@ -261,8 +261,8 @@ root /var/www/annotation;
 index index.html;
 
 # React SPA routing
-location / {
-    try_files $uri $uri/ /index.html;
+location /studio/ {
+    try_files $uri $uri/ /studio/index.html;
 }
 
 # Proxy API requests to the FastAPI backend.

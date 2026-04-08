@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Send, CheckCircle, BookOpen, User, Tag, AlertTriangle } from 'lucide-react';
+import { config } from '../config';
 
 interface SuggestTermModalProps {
   isOpen: boolean;
@@ -93,7 +94,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
 
     try {
       // Connect to the Python FastAPI backend
-      const response = await fetch('http://localhost:8001/api/proposals', {
+      const response = await fetch(`${config.api.baseUrl.replace(/\/$/, '')}/api/proposals`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
