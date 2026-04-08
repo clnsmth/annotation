@@ -127,7 +127,7 @@ describe('SuggestTermModal component', () => {
         });
 
         const fetchArgs = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
-        expect(fetchArgs[0]).toBe('http://localhost:8000/api/proposals');
+        expect(fetchArgs[0]).toBe('http://localhost:8001/api/proposals');
         const requestBody = JSON.parse(fetchArgs[1].body);
         expect(requestBody.target_vocabulary).toBe('ENVO');
         expect(requestBody.term_details.label).toBe('TestLabel');

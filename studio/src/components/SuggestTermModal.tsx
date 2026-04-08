@@ -93,7 +93,7 @@ export const SuggestTermModal: React.FC<SuggestTermModalProps> = ({ isOpen, onCl
 
     try {
       // Connect to the Python FastAPI backend
-      const response = await fetch('http://localhost:8000/api/proposals', {
+      const response = await fetch('http://localhost:8001/api/proposals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

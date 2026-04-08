@@ -7,7 +7,7 @@ User=pasta
 WorkingDirectory=/home/pasta/annotation/engine
 
 # Pixi-managed uvicorn; keep it bound to loopback only.
-ExecStart=/home/pasta/annotation/engine/.pixi/envs/default/bin/uvicorn webapp.run:app --host 127.0.0.1 --port 8000
+ExecStart=/home/pasta/annotation/engine/.pixi/envs/default/bin/uvicorn webapp.run:app --host 127.0.0.1 --port 8001
 
 ExecReload=/bin/kill -s HUP $MAINPID
 KillMode=mixed

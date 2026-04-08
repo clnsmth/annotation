@@ -4,10 +4,10 @@ This guide walks through deploying **Annotation Studio & Engine** on Ubuntu 22.0
 (or newer Ubuntu LTS). The result is:
 
 - **Engine** – FastAPI backend managed by a `systemd` service, listening on
-  `127.0.0.1:8000` (loopback only).
+  `127.0.0.1:8001` (loopback only).
 - **Studio** – React static build served by **nginx** over HTTPS.
 - **Reverse proxy** – nginx forwards API calls from `https://<your-domain>/api/...`
-  to the Engine on `http://127.0.0.1:8000`.
+  to the Engine on `http://127.0.0.1:8001`.
 
 This guide is written for a common real-world scenario on shared servers:
 
@@ -39,38 +39,34 @@ This guide is written for a common real-world scenario on shared servers:
 
 ## 2. Install System Dependencies
 
-### 2.1 Update the package index
+> This section assumes updated system packages and a working nginx installation.
+
+### 2.1 Install Node.js 24 (for building Studio)
 
 ```bash
-sudo apt update && sudo apt upgrade -y
+# Download and install nvm:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
+
+# in lieu of restarting the shell
+\. "$HOME/.nvm/nvm.sh"
+
+# Download and install Node.js:
+nvm install 24
+
+# Verify the Node.js version:
+node -v
+
+# Verify npm version:
+npm -v
+
 ```
 
-### 2.2 Install nginx (if not already installed)
-
-> If nginx is already present on your server (common), you can skip installation.
-> You should still verify the config is valid before and after changes.
-
-```bash
-sudo apt install -y nginx
-sudo systemctl enable --now nginx
-sudo systemctl status nginx --no-pager
-```
-
-### 2.3 Install Node.js 20 LTS (for building Studio)
-
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-node --version   # should print v20.x.x
-npm --version
-```
-
-### 2.4 Install Pixi
+### 2.2 Install Pixi
 
 Pixi manages the Python environment and dependencies for the Engine.
 
 ```bash
-curl -fsSL https://pixi.sh/install.sh | bash
+curl -fsSL https://pixi.sh/install.sh | sh
 ```
 
 After installation, open a new shell or source your shell profile so that the
@@ -93,7 +89,7 @@ Example:
 
 ```bash
 cd /home/<deploy-user>
-git clone https://github.com/clnsmth/annotation.git annotation
+git clone https://github.com/clnsmth/annotation.git
 ```
 
 ---
@@ -109,26 +105,6 @@ cp /home/<deploy-user>/annotation/engine/webapp/config.py.template \
 
 nano /home/<deploy-user>/annotation/engine/webapp/config.py
 ```
-
-Key settings to update for production:
-
-| Setting | Description |
-|---|---|
-| `VOCABULARY_PROPOSAL_RECIPIENT` | Email address that receives new term proposals |
-| `SMTP_SERVER` | Your SMTP server hostname (e.g. `smtp.gmail.com`) |
-| `SMTP_PORT` | Typically `587` (STARTTLS) or `465` (SSL) |
-| `SMTP_USER` | SMTP login username / sending address |
-| `SMTP_PASSWORD` | SMTP password or app-specific password |
-| `USE_MOCK_RECOMMENDATIONS` | Set to `False` to use the real recommender API |
-| `API_URL` | Full URL to the attribute recommender service |
-| `ANNOTATE_BATCH_SIZE` | Number of attributes submitted per recommender request |
-
-> **Security note:** `config.py` contains credentials. Ensure it is readable
-> only by the service user:
->
-> ```bash
-> chmod 600 /home/<deploy-user>/annotation/engine/webapp/config.py
-> ```
 
 ---
 
@@ -146,7 +122,7 @@ Confirm the environment is healthy:
 
 ```bash
 pixi run serve &   # start temporarily
-curl http://127.0.0.1:8000/   # should return a JSON response
+curl http://127.0.0.1:8001/   # should return a JSON response
 kill %1            # stop the temporary server
 ```
 
@@ -234,7 +210,7 @@ WorkingDirectory=/home/<deploy-user>/annotation/engine
 ExecStart=/home/<deploy-user>/annotation/engine/.pixi/envs/default/bin/uvicorn \
     webapp.run:app \
     --host 127.0.0.1 \
-    --port 8000
+    --port 8001
 Restart=on-failure
 RestartSec=5
 
@@ -296,7 +272,7 @@ location / {
 # - Internal FastAPI routes are typically /... (no /api prefix)
 # - The trailing slash on proxy_pass strips the /api/ prefix.
 location /api/ {
-    proxy_pass http://127.0.0.1:8000/;
+    proxy_pass http://127.0.0.1:8001/;
     proxy_http_version 1.1;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -321,7 +297,7 @@ sudo systemctl reload nginx
 ### 9.1 Engine health check (local)
 
 ```bash
-curl http://127.0.0.1:8000/
+curl http://127.0.0.1:8001/
 ```
 
 Expected: a JSON response from the FastAPI application.
