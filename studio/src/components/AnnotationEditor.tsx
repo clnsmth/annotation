@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { AnnotatableElement, OntologyTerm, AnnotationStatus } from '../types';
 import { Check, X, Plus, Search, Wand2, ChevronRight, ChevronDown, Trophy, Sparkles, Lightbulb } from 'lucide-react';
 import { SuggestTermModal } from './SuggestTermModal';
+import { config } from '../config';
 
 interface AnnotationEditorProps {
   elements: AnnotatableElement[];
@@ -344,7 +345,7 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
     };
 
     const blob = new Blob([JSON.stringify(logData)], { type: 'application/json' });
-    navigator.sendBeacon('http://localhost:8001/api/log-selection', blob);
+    navigator.sendBeacon(`${config.api.baseUrl.replace(/\/$/, '')}/api/log-selection`, blob);
   };
 
   const addAnnotation = (term: OntologyTerm) => {

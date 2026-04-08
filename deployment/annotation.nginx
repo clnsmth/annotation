@@ -5,14 +5,14 @@ server {
     index index.html index.htm index.nginx-debian.html;
     merge_slashes off;
 
-    location /annotation {
+    location /studio {
 	gzip on;
 	gzip_buffers 8 256k;
 	alias /home/pasta/annotation/studio/dist;
 	expires 365d;
     }
 
-    location /annotation/api {
+    location /api/ {
         gzip on;
         gzip_buffers 8 256k;
         proxy_pass http://127.0.0.1:8001;
