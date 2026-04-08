@@ -1,0 +1,53 @@
+[workspace]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-arm64", "linux-aarch64"]
+
+# ── Engine feature ──────────────────────────────────────────────────────────
+
+[feature.engine.dependencies]
+python = "3.13.*"
+fastapi = ">=0.133"
+uvicorn = ">=0.41"
+gunicorn = ">=23.0"
+pydantic = ">=2.12"
+httpx = ">=0.28"
+requests = ">=2.32"
+lxml = ">=6.0"
+proj = ">=9.0"
+
+[feature.engine.pypi-dependencies]
+geoenv = ">=0.1"
+
+[feature.engine.tasks]
+serve = { cmd = "uvicorn webapp.run:app --reload --port 8001", cwd = "engine" }
+
+# ── Engine dev feature ───────────────────────────────────────────────────────
+
+[feature.dev.dependencies]
+pytest = ">=9.0"
+ruff = ">=0.15"
+
+[feature.dev.tasks]
+test = { cmd = "pytest", cwd = "engine" }
+lint = { cmd = "ruff check webapp/ tests/", cwd = "engine" }
+format = { cmd = "ruff format webapp/ tests/", cwd = "engine" }
+
+# ── Studio feature ───────────────────────────────────────────────────────────
+
+[feature.studio.dependencies]
+nodejs = ">=22"
+
+[feature.studio.tasks]
+studio-install = { cmd = "npm install", cwd = "studio" }
+studio-dev = { cmd = "npm run dev", cwd = "studio", depends-on = ["studio-install"] }
+studio-build = { cmd = "npm run build", cwd = "studio", depends-on = ["studio-install"] }
+studio-test = { cmd = "npm run test", cwd = "studio", depends-on = ["studio-install"] }
+studio-lint = { cmd = "npm run lint", cwd = "studio", depends-on = ["studio-install"] }
+
+# ── Environments ─────────────────────────────────────────────────────────────
+
+[environments]
+default = { features = ["engine", "studio"], solve-group = "default" }
+engine = { features = ["engine"], solve-group = "default" }
+studio = { features = ["studio"] }
+dev = { features = ["engine", "dev", "studio"], solve-group = "default" }

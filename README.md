@@ -36,14 +36,19 @@ For production server setup, see the
 
 ### Prerequisites
 
-- [Pixi](https://pixi.sh) (for the engine)
-- [Node.js](https://nodejs.org/) (for the studio)
+- [Pixi](https://pixi.sh) (manages both Python and Node.js environments)
+
+### Install
+
+From the repo root, install all environments at once:
+
+```bash
+pixi install
+```
 
 ### Engine
 
 ```bash
-cd engine
-pixi install
 pixi run serve
 ```
 
@@ -52,9 +57,7 @@ The API will be available at <http://localhost:8001>.
 ### Studio
 
 ```bash
-cd studio
-npm install
-npm run dev
+pixi run studio-dev
 ```
 
 The app will be available at <http://localhost:3000>.
@@ -62,8 +65,7 @@ The app will be available at <http://localhost:3000>.
 You can check the Studio code for linting errors with:
 
 ```bash
-cd studio
-npm run lint
+pixi run studio-lint
 ```
 
 ## License
