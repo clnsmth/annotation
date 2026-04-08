@@ -1,46 +1,52 @@
 server {
-        # Annotation Studio (static SPA) + Engine reverse proxy
-        server_name annotation.edirepository.org;
-        merge_slashes off;
+    server_name annotation.edirepository.org;
 
-        # Serve the built Studio (publish step copies studio/dist -> /var/www/annotation)
-        root /var/www/annotation;
-        index index.html;
+    root /var/www/html;
+    index index.html index.htm index.nginx-debian.html;
+    merge_slashes off;
 
-        # Allow larger uploads if needed (EML files, etc.)
+    location /annotation {
+	gzip on;
+	gzip_buffers 8 256k;
+	alias /home/pasta/annotation/studio/dist;
+	expires 365d;
+    }
+
+    location /annotation/api {
+        gzip on;
+        gzip_buffers 8 256k;
+        proxy_pass http://127.0.0.1:8001;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Protocol $scheme;
+        proxy_set_header  Host $http_host;
+        proxy_set_header Connection "";
+        proxy_buffering off;
+        proxy_buffer_size 8k;
+        proxy_max_temp_file_size 0;
+        proxy_connect_timeout       2100;
+        proxy_send_timeout      2100;
+        proxy_read_timeout      2100;
+        send_timeout        2100;
         client_max_body_size 512m;
+    }
 
-        # React SPA routing: serve index.html for non-file paths
-        location / {
-                gzip on;
-                gzip_buffers 8 256k;
-                try_files $uri $uri/ /index.html;
-        }
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/elly.edirepository.org/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/elly.edirepository.org/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
-        # Proxy API requests to Engine (FastAPI on localhost:8000).
-        #
-        # IMPORTANT: the trailing slash on proxy_pass strips the /api/ prefix.
-        #   /api/documents/targets -> http://127.0.0.1:8000/documents/targets
-        location /api/ {
-                gzip on;
-                gzip_buffers 8 256k;
+}
+server {
+    if ($host = annotation.edirepository.org) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
 
-                proxy_pass http://127.0.0.1:8000/;
-                proxy_http_version 1.1;
 
-                proxy_set_header Host $host;
-                proxy_set_header X-Real-IP $remote_addr;
-                proxy_set_header X-Forwarded-Protocol $scheme;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    server_name annotation.edirepository.org;
 
-                proxy_buffering off;
-                proxy_buffer_size 8k;
-                proxy_max_temp_file_size 0;
+    listen 80;
+    return 404; # managed by Certbot
 
-                proxy_set_header Connection "";
-                proxy_connect_timeout       2100;
-                proxy_send_timeout          2100;
-                proxy_read_timeout          2100;
-                send_timeout                2100;
-        }
+
 }
