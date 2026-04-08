@@ -1,13 +1,13 @@
 [Unit]
-Description=Uvicorn service for annotation-engine (FastAPI)
+Description=Gunicorn service for annotation-engine (FastAPI)
 After=network.target
 
 [Service]
 User=pasta
 WorkingDirectory=/home/pasta/annotation/engine
 
-# Pixi-managed uvicorn; keep it bound to loopback only.
-ExecStart=/home/pasta/annotation/engine/.pixi/envs/default/bin/uvicorn webapp.run:app --host 127.0.0.1 --port 8001
+# Pixi-managed gunicorn with uvicorn workers; keep it bound to loopback only.
+ExecStart=/home/pasta/annotation/engine/.pixi/envs/default/bin/gunicorn webapp.run:app -w 4 -k uvicorn.workers.UvicornWorker --bind 127.0.0.1:8001
 
 ExecReload=/bin/kill -s HUP $MAINPID
 KillMode=mixed
