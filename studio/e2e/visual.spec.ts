@@ -9,7 +9,7 @@ test.describe('Annotation Studio Visual Regression', () => {
 
         // 2. Editor Screen (with example data)
         // Mock targets endpoint since backend is not running
-        await page.route('http://localhost:8000/api/documents/targets', async route => {
+        await page.route('http://localhost:8001/api/documents/targets', async route => {
             await route.fulfill({ json: mockTargets });
         });
 

@@ -38,7 +38,7 @@ proj = ">=9.0"
 geoenv = ">=0.1"
 
 [tool.pixi.tasks]
-serve = "uvicorn webapp.run:app --reload"
+serve = "uvicorn webapp.run:app --reload --port 8001"
 
 [tool.pixi.feature.dev.dependencies]
 pytest = ">=9.0"
