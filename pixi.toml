@@ -31,6 +31,7 @@ ruff = ">=0.15"
 test = { cmd = "pytest", cwd = "engine" }
 lint = { cmd = "ruff check webapp/ tests/", cwd = "engine" }
 format = { cmd = "ruff format webapp/ tests/", cwd = "engine" }
+format-check = { cmd = "ruff format --check webapp/ tests/", cwd = "engine" }
 
 # ── Studio feature ───────────────────────────────────────────────────────────
 
