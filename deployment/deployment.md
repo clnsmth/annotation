@@ -41,29 +41,9 @@ This guide is written for a common real-world scenario on shared servers:
 
 > This section assumes updated system packages and a working nginx installation.
 
-### 2.1 Install Node.js 24 (for building Studio)
+### 2.1 Install Pixi
 
-```bash
-# Download and install nvm:
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
-
-# in lieu of restarting the shell
-\. "$HOME/.nvm/nvm.sh"
-
-# Download and install Node.js:
-nvm install 24
-
-# Verify the Node.js version:
-node -v
-
-# Verify npm version:
-npm -v
-
-```
-
-### 2.2 Install Pixi
-
-Pixi manages the Python environment and dependencies for the Engine.
+Pixi manages the Python and Node.js environments and dependencies for the project.
 
 ```bash
 curl -fsSL https://pixi.sh/install.sh | sh
@@ -108,15 +88,15 @@ nano /home/<deploy-user>/annotation/engine/webapp/config.py
 
 ---
 
-## 5. Install Engine Dependencies
+## 5. Install Project Dependencies
 
 ```bash
-cd /home/<deploy-user>/annotation/engine
+cd /home/<deploy-user>/annotation
 pixi install
 ```
 
-Pixi creates a self-contained environment under `engine/.pixi/`. No system
-Python packages are modified.
+Pixi creates a self-contained environment under `.pixi/`. No system
+packages are modified.
 
 Confirm the environment is healthy:
 
@@ -154,9 +134,8 @@ EOF
 ### 6.3 Build Studio
 
 ```bash
-cd /home/<deploy-user>/annotation/studio
-npm install
-npm run build
+cd /home/<deploy-user>/annotation
+pixi run studio-build
 ```
 
 The production build is written to `studio/dist/`.
@@ -186,7 +165,7 @@ automatically on failure.
 
 ### 7.1 Find the Pixi-managed gunicorn binary
 ```bash
-ls /home/<deploy-user>/annotation/engine/.pixi/envs/default/bin/gunicorn
+ls /home/<deploy-user>/annotation/.pixi/envs/default/bin/gunicorn
 ```
 
 ### 7.2 Create the service file
@@ -206,7 +185,7 @@ After=network.target
 Type=simple
 User=<deploy-user>
 WorkingDirectory=/home/<deploy-user>/annotation/engine
-ExecStart=/home/<deploy-user>/annotation/engine/.pixi/envs/default/bin/gunicorn \
+ExecStart=/home/<deploy-user>/annotation/.pixi/envs/default/bin/gunicorn \
     webapp.run:app \
     -w 4 \
     -k uvicorn.workers.UvicornWorker \
@@ -328,15 +307,12 @@ Expected: a JSON response proxied from the Engine.
 cd /home/<deploy-user>/annotation
 git pull
 
-# Rebuild/publish the Studio if frontend files changed
-cd studio
-npm install
-npm run build
-sudo rsync -a --delete dist/ /var/www/annotation/
-
-# Reinstall Engine dependencies if pyproject.toml changed
-cd ../engine
+# Update dependencies if pixi.toml changed
 pixi install
+
+# Rebuild/publish the Studio if frontend files changed
+pixi run studio-build
+sudo rsync -a --delete studio/dist/ /var/www/annotation/
 
 # Restart the Engine service to pick up backend changes
 sudo systemctl restart annotation-engine
