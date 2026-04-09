@@ -43,6 +43,8 @@ studio-dev = { cmd = "npm run dev", cwd = "studio", depends-on = ["studio-instal
 studio-build = { cmd = "npm run build", cwd = "studio", depends-on = ["studio-install"] }
 studio-test = { cmd = "npm run test", cwd = "studio", depends-on = ["studio-install"] }
 studio-lint = { cmd = "npm run lint", cwd = "studio", depends-on = ["studio-install"] }
+studio-playwright-install = { cmd = "npx playwright install --with-deps", cwd = "studio", depends-on = ["studio-install"] }
+studio-e2e = { cmd = "npx playwright test", cwd = "studio", depends-on = ["studio-playwright-install"] }
 
 # ── Environments ─────────────────────────────────────────────────────────────
 
