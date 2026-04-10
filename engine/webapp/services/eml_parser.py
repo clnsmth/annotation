@@ -287,7 +287,7 @@ def _find_annotatable_entities(
             entity_name = (
                 _text(entity_node, "entityName") or f"{entity_label} {entity_idx + 1}"
             )
-            entity_desc = _text(entity_node, "entityDescription")
+            entity_desc = _text(entity_node, "entityDescription", "contextDescription")
             object_name = _text(entity_node, "objectName")
 
             yield EmlEntity(
