@@ -10,6 +10,7 @@ for improving AI recommendation engines over time.
 
 **File path (configurable):** `user-behavior.jsonl`
 **Written by:** `POST /api/log-selection`
+**Read by:** `GET /api/user-behavior`
 **Format:** One JSON object per line (JSONL / NDJSON)
 
 ---
@@ -76,6 +77,56 @@ and each unchosen alternative (`not_selected`) share this structure.
     }
   ]
 }
+```
+
+---
+
+## Endpoint: `GET /api/user-behavior`
+
+Returns the entire contents of the user-behavior log as a JSON array. Each
+element in the array corresponds to one line in the underlying JSONL file.
+
+### Request
+
+```
+GET /api/user-behavior
+```
+
+No query parameters or request body are required.
+
+### Response
+
+**200 OK** — a JSON array of selection-event objects.
+
+```json
+[
+  {
+    "request_id": "54a68e57-2a96-43fe-99bf-5e0e5c195e53",
+    "event_id": "0693d0c8-7105-4046-bff9-4a21fa089f40",
+    "timestamp": "2025-12-22T15:35:07.273000Z",
+    "element_id": "8a90023e-72cc-4540-a4b2-d4532ea86c38",
+    "element_name": "SurveyID",
+    "element_type": "ATTRIBUTE",
+    "selected": {
+      "label": "plot identifier",
+      "uri": "http://purl.dataone.org/odo/ECSO_00002432",
+      "property_label": "contains measurements of type",
+      "property_uri": "http://ecoinformatics.org/oboe/oboe.1.2/oboe-core.owl#containsMeasurementsOfType",
+      "confidence": 0.85
+    },
+    "not_selected": []
+  }
+]
+```
+
+Returns an **empty array** (`[]`) when the log file does not exist yet.
+
+**500 Internal Server Error** — if the log file cannot be read.
+
+### Example (curl)
+
+```bash
+curl http://localhost:8000/api/user-behavior
 ```
 
 ---

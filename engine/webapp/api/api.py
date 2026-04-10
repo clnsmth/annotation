@@ -25,7 +25,7 @@ from webapp.services.audit import generate_audit_report
 from webapp.models.log_selection import LogSelection
 from webapp.models.document_request import ExportRequest, AuditRequest
 from webapp.config import Config
-from webapp.utils.utils import append_jsonl
+from webapp.utils.utils import append_jsonl, read_jsonl
 
 daiquiri.setup()
 logger = daiquiri.getLogger(__name__)
@@ -132,6 +132,25 @@ async def log_selection(payload: LogSelection):
         logger.exception("Error persisting user behavior event: %s", e)
         raise HTTPException(
             status_code=500, detail="Internal server error persisting selection event."
+        ) from e
+
+
+@router.get("/api/user-behavior")
+def get_user_behavior() -> JSONResponse:
+    """
+    Returns all records from the user-behavior log as a JSON array.
+
+    :return: JSONResponse containing a list of user-behavior event objects
+    :raises HTTPException: If an error occurs while reading the log file
+    """
+    try:
+        records = read_jsonl(Config.USER_BEHAVIOR_LOG_PATH)
+        logger.info("get_user_behavior: returning %d records.", len(records))
+        return JSONResponse(content=records, status_code=200)
+    except Exception as e:
+        logger.exception("Error reading user behavior log: %s", e)
+        raise HTTPException(
+            status_code=500, detail="Internal server error reading user behavior log."
         ) from e
 
 
