@@ -2,6 +2,8 @@
 Utility functions for ontology extraction, recommendation merging, and EML data formatting.
 """
 
+import json
+import os
 import re
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
@@ -24,6 +26,26 @@ def append_jsonl(path: str, record: BaseModel) -> None:
     """
     with open(path, "a", encoding="utf-8") as f:
         f.write(record.model_dump_json() + "\n")
+
+
+def read_jsonl(path: str) -> List[Dict[str, Any]]:
+    """
+    Read all records from a newline-delimited JSON file and return them as a list.
+
+    :param path: File path to read from
+    :return: List of parsed JSON objects; empty list if the file does not exist
+    :raises OSError: If the file exists but cannot be read
+    :raises json.JSONDecodeError: If a line is not valid JSON
+    """
+    if not os.path.exists(path):
+        return []
+    records: List[Dict[str, Any]] = []
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                records.append(json.loads(line))
+    return records
 
 
 def extract_ontology(uri: Optional[str]) -> str:
