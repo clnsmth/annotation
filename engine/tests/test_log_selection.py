@@ -94,8 +94,10 @@ def test_get_user_behavior_returns_list(client: Any) -> None:
     Test that GET /api/user-behavior returns 200 and a JSON array.
     """
     jsonl_content = json.dumps(MOCK_SELECTION) + "\n"
-    with patch("builtins.open", mock_open(read_data=jsonl_content)), \
-         patch("os.path.exists", return_value=True):
+    with (
+        patch("builtins.open", mock_open(read_data=jsonl_content)),
+        patch("os.path.exists", return_value=True),
+    ):
         response = client.get("/api/user-behavior")
     assert response.status_code == 200
     data = response.json()
@@ -121,8 +123,10 @@ def test_get_user_behavior_multiple_records(client: Any) -> None:
     """
     line = json.dumps(MOCK_SELECTION)
     jsonl_content = line + "\n" + line + "\n"
-    with patch("builtins.open", mock_open(read_data=jsonl_content)), \
-         patch("os.path.exists", return_value=True):
+    with (
+        patch("builtins.open", mock_open(read_data=jsonl_content)),
+        patch("os.path.exists", return_value=True),
+    ):
         response = client.get("/api/user-behavior")
     assert response.status_code == 200
     data = response.json()
@@ -133,7 +137,9 @@ def test_get_user_behavior_read_failure_returns_500(client: Any) -> None:
     """
     Test that GET /api/user-behavior returns 500 when the log file cannot be read.
     """
-    with patch("os.path.exists", return_value=True), \
-         patch("builtins.open", side_effect=OSError("permission denied")):
+    with (
+        patch("os.path.exists", return_value=True),
+        patch("builtins.open", side_effect=OSError("permission denied")),
+    ):
         response = client.get("/api/user-behavior")
     assert response.status_code == 500
