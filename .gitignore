@@ -218,6 +218,7 @@ __marimo__/
 
 # Engine Data
 engine/proposals.jsonl
+engine/user-behavior.jsonl
 
 # ---------------------------------------------------------------------------
 # Node.js / Vite / Studio specific
