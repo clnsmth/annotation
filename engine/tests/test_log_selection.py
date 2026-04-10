@@ -47,7 +47,9 @@ def test_log_selection_persists_to_jsonl(client: Any) -> None:
         response = client.post("/api/log-selection", json=MOCK_SELECTION)
         assert response.status_code == 200
 
-        mocked_file.assert_called_once_with("user-behavior.jsonl", "a", encoding="utf-8")
+        mocked_file.assert_called_once_with(
+            "user-behavior.jsonl", "a", encoding="utf-8"
+        )
         handle = mocked_file()
         written = "".join(call.args[0] for call in handle.write.call_args_list)
         record = json.loads(written.strip())
