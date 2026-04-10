@@ -147,7 +147,7 @@ def get_user_behavior() -> JSONResponse:
         records = read_jsonl(Config.USER_BEHAVIOR_LOG_PATH)
         logger.info("get_user_behavior: returning %d records.", len(records))
         return JSONResponse(content=records, status_code=200)
-    except Exception as e:
+    except (OSError, json.JSONDecodeError) as e:
         logger.exception("Error reading user behavior log: %s", e)
         raise HTTPException(
             status_code=500, detail="Internal server error reading user behavior log."

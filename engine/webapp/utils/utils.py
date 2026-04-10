@@ -2,6 +2,8 @@
 Utility functions for ontology extraction, recommendation merging, and EML data formatting.
 """
 
+import json
+import os
 import re
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
@@ -35,9 +37,6 @@ def read_jsonl(path: str) -> List[Dict[str, Any]]:
     :raises OSError: If the file exists but cannot be read
     :raises json.JSONDecodeError: If a line is not valid JSON
     """
-    import json
-    import os
-
     if not os.path.exists(path):
         return []
     records: List[Dict[str, Any]] = []
