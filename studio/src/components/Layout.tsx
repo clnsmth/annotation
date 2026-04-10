@@ -20,8 +20,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, step }) => {
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-800 tracking-tight">EML Annotation Studio</h1>
-              <p className="text-xs text-indigo-600 font-medium">Powered by AI</p>
+              <h1 className="text-xl font-bold text-slate-800 tracking-tight">Semantic Annotation Studio</h1>
             </div>
           </div>
 
