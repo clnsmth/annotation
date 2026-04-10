@@ -1,4 +1,5 @@
 import React from 'react';
+import ediLogoUrl from '../assets/EDI-logo.png';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,8 +15,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, step }) => {
           <div className="flex items-center space-x-3">
             <div className="bg-white p-1 rounded-xl shadow-sm border border-slate-100 overflow-hidden">
               <img 
-                src="https://edirepository.org/static/images/EDI-logo.png" 
-                alt="EML Logo" 
+                src={ediLogoUrl} 
+                alt="EDI Logo" 
                 className="w-8 h-8 block object-contain"
               />
             </div>
