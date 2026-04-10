@@ -2,6 +2,7 @@
 Pydantic models for validating log-selection POST requests in the annotation engine.
 """
 
+from datetime import datetime
 from typing import List
 from pydantic import BaseModel
 
@@ -25,7 +26,7 @@ class LogSelection(BaseModel):
 
     request_id: str
     event_id: str
-    timestamp: str  # ISO 8601 string, could use datetime with custom parsing
+    timestamp: datetime
     element_id: str
     element_name: str
     element_type: str

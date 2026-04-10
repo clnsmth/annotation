@@ -6,6 +6,7 @@ import json
 from typing import Any
 from unittest.mock import mock_open, patch
 
+from webapp.config import Config
 from webapp.models.mock_objects import MOCK_SELECTION
 
 
@@ -48,7 +49,7 @@ def test_log_selection_persists_to_jsonl(client: Any) -> None:
         assert response.status_code == 200
 
         mocked_file.assert_called_once_with(
-            "user-behavior.jsonl", "a", encoding="utf-8"
+            Config.USER_BEHAVIOR_LOG_PATH, "a", encoding="utf-8"
         )
         handle = mocked_file()
         written = "".join(call.args[0] for call in handle.write.call_args_list)
@@ -69,10 +70,20 @@ def test_log_selection_jsonl_format(client: Any) -> None:
 
         assert mocked_file.call_count == 2
         for call in mocked_file.call_args_list:
-            assert call == (("user-behavior.jsonl", "a"), {"encoding": "utf-8"})
+            assert call == ((Config.USER_BEHAVIOR_LOG_PATH, "a"), {"encoding": "utf-8"})
 
         for call in mocked_file().write.call_args_list:
             line = call.args[0]
             if line.strip():
                 record = json.loads(line.strip())
                 assert "event_id" in record
+
+
+def test_log_selection_write_failure_returns_500(client: Any) -> None:
+    """
+    Test that POST /api/log-selection returns 500 when the JSONL file cannot be written,
+    ensuring write failures are never silently dropped.
+    """
+    with patch("builtins.open", side_effect=OSError("disk full")):
+        response = client.post("/api/log-selection", json=MOCK_SELECTION)
+        assert response.status_code == 500

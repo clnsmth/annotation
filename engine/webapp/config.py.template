@@ -12,6 +12,8 @@ class Config:
     :cvar SMTP_PORT: SMTP server port
     :cvar SMTP_USER: SMTP username
     :cvar SMTP_PASSWORD: SMTP password
+    :cvar PROPOSALS_LOG_PATH: File path for the term-proposal JSONL log
+    :cvar USER_BEHAVIOR_LOG_PATH: File path for the user-behavior JSONL log
     :cvar USE_MOCK_RECOMMENDATIONS: Whether to use mock recommendations
     :cvar MAX_RECOMMENDATIONS_PER_ELEMENT: Max recommendations per element
     :cvar MERGE_CONFIG: Configuration for merging recommender results
@@ -21,6 +23,10 @@ class Config:
     SMTP_PORT = 587
     SMTP_USER = 'curator@mail.com'
     SMTP_PASSWORD = 'xxxx xxxx xxxx xxxx'
+
+    # JSONL log file paths
+    PROPOSALS_LOG_PATH: str = "proposals.jsonl"
+    USER_BEHAVIOR_LOG_PATH: str = "user-behavior.jsonl"
 
     # Centralized configuration for annotation engine
     USE_MOCK_RECOMMENDATIONS: bool = True  # Set to False to use real recommendation logic

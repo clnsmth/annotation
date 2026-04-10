@@ -24,6 +24,8 @@ from webapp.services.eml_parser import parse_eml, export_eml
 from webapp.services.audit import generate_audit_report
 from webapp.models.log_selection import LogSelection
 from webapp.models.document_request import ExportRequest, AuditRequest
+from webapp.config import Config
+from webapp.utils.utils import append_jsonl
 
 daiquiri.setup()
 logger = daiquiri.getLogger(__name__)
@@ -58,8 +60,7 @@ async def submit_proposal(
         # 1. Log to persistent mock database (file)
         # ADR 0001 specifies no external DB right now; we use a .jsonl stub
         # so that proposal records are safely preserved regardless of email failure.
-        with open("proposals.jsonl", "a", encoding="utf-8") as f:
-            f.write(proposal.model_dump_json() + "\n")
+        append_jsonl(Config.PROPOSALS_LOG_PATH, proposal)
 
         # 2. Queue email dispatch
         background_tasks.add_task(send_email_notification, proposal)
@@ -121,11 +122,17 @@ async def log_selection(payload: LogSelection):
 
     :param payload: The validated log-selection payload
     :return: Status message indicating receipt
+    :raises HTTPException: If an error occurs while persisting the event
     """
-    with open("user-behavior.jsonl", "a", encoding="utf-8") as f:
-        f.write(payload.model_dump_json() + "\n")
-    logger.info("User behavior event logged to disk.")
-    return {"status": "received"}
+    try:
+        append_jsonl(Config.USER_BEHAVIOR_LOG_PATH, payload)
+        logger.info("User behavior event logged to disk.")
+        return {"status": "received"}
+    except Exception as e:
+        logger.exception("Error persisting user behavior event: %s", e)
+        raise HTTPException(
+            status_code=500, detail="Internal server error persisting selection event."
+        ) from e
 
 
 @router.post("/api/documents/targets")
