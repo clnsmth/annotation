@@ -116,14 +116,15 @@ def recommend_annotations(payload: Dict[str, Any] = Body(...)) -> JSONResponse:
 @router.post("/api/log-selection")
 async def log_selection(payload: LogSelection):
     """
-    Receives a log-selection POST payload, prints it for debugging, and returns a status response.
+    Receives a log-selection POST payload, persists it to a JSONL file for
+    use in training AI recommendation engines, and returns a status response.
 
     :param payload: The validated log-selection payload
     :return: Status message indicating receipt
     """
-    print("\n--- 🐍 Incoming Python Beacon ---")
-    print(json.dumps(payload.model_dump(), indent=2))
-    print("---------------------------------\n")
+    with open("user-behavior.jsonl", "a", encoding="utf-8") as f:
+        f.write(payload.model_dump_json() + "\n")
+    logger.info("User behavior event logged to disk.")
     return {"status": "received"}
 
 
