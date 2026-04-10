@@ -7,10 +7,23 @@ from collections import defaultdict
 from typing import Any, Dict, List, Optional
 
 import daiquiri
+from pydantic import BaseModel
 from webapp.config import Config
 
 daiquiri.setup()
 logger = daiquiri.getLogger(__name__)
+
+
+def append_jsonl(path: str, record: BaseModel) -> None:
+    """
+    Append a Pydantic model as a newline-delimited JSON record to a file.
+
+    :param path: File path to append to
+    :param record: Pydantic model instance to serialise
+    :raises OSError: If the file cannot be opened or written
+    """
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(record.model_dump_json() + "\n")
 
 
 def extract_ontology(uri: Optional[str]) -> str:
