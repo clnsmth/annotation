@@ -12,7 +12,7 @@ describe('Layout', () => {
     );
 
     // Check if the title is present
-    expect(screen.getByText('Semantic Annotation Studio')).toBeInTheDocument();
+    expect(screen.getByText('Annotation Studio')).toBeInTheDocument();
 
     // Check if children are rendered
     expect(screen.getByTestId('test-child')).toHaveTextContent('Test Content');

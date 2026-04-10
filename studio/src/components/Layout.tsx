@@ -20,7 +20,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, step }) => {
               />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-800 tracking-tight">Semantic Annotation Studio</h1>
+              <h1 className="text-xl font-bold text-slate-800 tracking-tight">Annotation Studio</h1>
             </div>
           </div>
 
