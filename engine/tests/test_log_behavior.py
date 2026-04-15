@@ -7,7 +7,11 @@ from typing import Any
 from unittest.mock import mock_open, patch
 
 from webapp.config import Config
-from webapp.models.mock_objects import MOCK_CUSTOM_ANNOTATION, MOCK_REMOVAL, MOCK_SELECTION
+from webapp.models.mock_objects import (
+    MOCK_CUSTOM_ANNOTATION,
+    MOCK_REMOVAL,
+    MOCK_SELECTION,
+)
 
 
 def test_log_behavior_endpoint(client: Any) -> None:
@@ -137,9 +141,14 @@ def test_log_behavior_custom_annotation(client: Any) -> None:
         written = "".join(call.args[0] for call in handle.write.call_args_list)
         record = json.loads(written.strip())
         assert record["event_type"] == "custom_annotation"
-        assert record["selected"]["label"] == MOCK_CUSTOM_ANNOTATION["selected"]["label"]
+        assert (
+            record["selected"]["label"] == MOCK_CUSTOM_ANNOTATION["selected"]["label"]
+        )
         assert record["selected"]["uri"] == MOCK_CUSTOM_ANNOTATION["selected"]["uri"]
-        assert record["selected"]["confidence"] == MOCK_CUSTOM_ANNOTATION["selected"]["confidence"]
+        assert (
+            record["selected"]["confidence"]
+            == MOCK_CUSTOM_ANNOTATION["selected"]["confidence"]
+        )
         assert record["not_selected"] == []
 
 
@@ -157,7 +166,9 @@ def test_log_behavior_removal(client: Any) -> None:
         record = json.loads(written.strip())
         assert record["event_type"] == "removal"
         assert record["selected"]["uri"] == MOCK_REMOVAL["selected"]["uri"]
-        assert record["selected"]["confidence"] == MOCK_REMOVAL["selected"]["confidence"]
+        assert (
+            record["selected"]["confidence"] == MOCK_REMOVAL["selected"]["confidence"]
+        )
         assert record["not_selected"] == []
 
 
@@ -215,4 +226,3 @@ def test_get_user_behavior_read_failure_returns_500(client: Any) -> None:
     ):
         response = client.get("/api/user-behavior")
     assert response.status_code == 500
-
