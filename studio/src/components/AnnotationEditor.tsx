@@ -4,6 +4,8 @@ import { Check, X, Plus, Search, Wand2, ChevronRight, ChevronDown, Trophy, Spark
 import { SuggestTermModal } from './SuggestTermModal';
 import { config } from '../config';
 
+type BehaviorEventType = 'selection' | 'custom_annotation' | 'removal';
+
 interface AnnotationEditorProps {
   elements: AnnotatableElement[];
   onUpdateElement: (id: string, updates: Partial<AnnotatableElement>) => void;
@@ -316,14 +318,24 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
   const suggestions = PROPERTY_SUGGESTIONS[element.type] || [];
 
   /**
-   * Logs selection behavior to the server
+   * Logs a behavior event to the server
    */
-  const logSelection = (selected: OntologyTerm, allRecommendations: OntologyTerm[]) => {
-    const ignored = allRecommendations.filter(r => r.uri !== selected.uri);
+  const logBehavior = (
+    eventType: BehaviorEventType,
+    selected: OntologyTerm,
+    notSelected: OntologyTerm[]
+  ) => {
+    const generateId = () => crypto.randomUUID?.() || Math.random().toString(36).substring(2);
+    // For selection events use the recommendation's request_id; for other event types
+    // there is no originating recommendation request so a new UUID is generated.
+    const requestId = eventType === 'selection' && selected.request_id
+      ? selected.request_id
+      : generateId();
 
     const logData = {
-      request_id: selected.request_id, // Top-level key, retrieved from selected recommendation
-      event_id: crypto.randomUUID?.() || Math.random().toString(36).substring(2),
+      event_type: eventType,
+      request_id: requestId,
+      event_id: generateId(),
       timestamp: new Date().toISOString(),
       element_id: element.id,
       element_name: element.name,
@@ -335,7 +347,7 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
         property_uri: selected.propertyUri,
         confidence: selected.confidence
       },
-      not_selected: ignored.map(r => ({
+      not_selected: notSelected.map(r => ({
         label: r.label,
         uri: r.uri,
         property_label: r.propertyLabel,
@@ -345,7 +357,7 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
     };
 
     const blob = new Blob([JSON.stringify(logData)], { type: 'application/json' });
-    navigator.sendBeacon(`${config.api.baseUrl.replace(/\/$/, '')}/api/log-selection`, blob);
+    navigator.sendBeacon(`${config.api.baseUrl.replace(/\/$/, '')}/api/log-behavior`, blob);
   };
 
   const addAnnotation = (term: OntologyTerm) => {
@@ -370,6 +382,8 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
         // Add to recommendations list so user can re-select it
         nextRecommended = [annotationToRemove, ...element.recommendedAnnotations];
       }
+      // Log the removal behavior
+      logBehavior('removal', annotationToRemove, []);
     }
 
     onUpdate({
@@ -381,7 +395,7 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
 
   const acceptRecommendation = (rec: OntologyTerm) => {
     // Log the behavior
-    logSelection(rec, element.recommendedAnnotations);
+    logBehavior('selection', rec, element.recommendedAnnotations.filter(r => r.uri !== rec.uri));
 
     // Add the annotation
     addAnnotation(rec);
@@ -394,7 +408,7 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
     const finalPropLabel = customPropLabel.trim() || 'contains';
     const finalPropUri = customPropUri.trim() || 'http://www.w3.org/ns/oa#hasBody';
 
-    addAnnotation({
+    const customTerm: OntologyTerm = {
       label: customLabel.trim(),
       uri: customUri.trim(),
       ontology: 'User Defined',
@@ -402,7 +416,12 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
       description: 'Manually added annotation',
       propertyLabel: finalPropLabel,
       propertyUri: finalPropUri
-    });
+    };
+
+    // Log the custom annotation behavior
+    logBehavior('custom_annotation', customTerm, []);
+
+    addAnnotation(customTerm);
 
     // Reset and close
     setCustomLabel('');

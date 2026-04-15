@@ -2516,6 +2516,7 @@ MOCK_FRONTEND_PAYLOAD = {
 
 
 MOCK_SELECTION = {
+    "event_type": "selection",
     "request_id": "54a68e57-2a96-43fe-99bf-5e0e5c195e53",
     "event_id": "0693d0c8-7105-4046-bff9-4a21fa089f40",
     "timestamp": "2025-12-22T15:35:07.273Z",
@@ -2545,4 +2546,40 @@ MOCK_SELECTION = {
             "confidence": 0.75,
         },
     ],
+}
+
+MOCK_CUSTOM_ANNOTATION = {
+    "event_type": "custom_annotation",
+    "request_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "event_id": "f0e1d2c3-b4a5-9678-fedc-ba0987654321",
+    "timestamp": "2025-12-22T16:10:00.000Z",
+    "element_id": "8a90023e-72cc-4540-a4b2-d4532ea86c38",
+    "element_name": "SurveyID",
+    "element_type": "ATTRIBUTE",
+    "selected": {
+        "label": "survey identifier",
+        "uri": "http://example.org/custom/survey-identifier",
+        "property_label": "contains measurements of type",
+        "property_uri": "http://ecoinformatics.org/oboe/oboe.1.2/oboe-core.owl#containsMeasurementsOfType",
+        "confidence": 1.0,
+    },
+    "not_selected": [],
+}
+
+MOCK_REMOVAL = {
+    "event_type": "removal",
+    "request_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+    "event_id": "e1d2c3b4-a5f6-7890-edcb-a09876543210",
+    "timestamp": "2025-12-22T16:20:00.000Z",
+    "element_id": "8a90023e-72cc-4540-a4b2-d4532ea86c38",
+    "element_name": "SurveyID",
+    "element_type": "ATTRIBUTE",
+    "selected": {
+        "label": "plot identifier",
+        "uri": "http://purl.dataone.org/odo/ECSO_00002432",
+        "property_label": "contains measurements of type",
+        "property_uri": "http://ecoinformatics.org/oboe/oboe.1.2/oboe-core.owl#containsMeasurementsOfType",
+        "confidence": 0.85,
+    },
+    "not_selected": [],
 }
