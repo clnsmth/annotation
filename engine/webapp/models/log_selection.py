@@ -35,5 +35,6 @@ class LogBehavior(BaseModel):
     not_selected: List[SelectionItem]
 
 
-# Backward-compatible alias
+# Backward-compatible alias retained to avoid breaking existing imports.
+# Should be removed once all callers have been updated to use LogBehavior directly.
 LogSelection = LogBehavior

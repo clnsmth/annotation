@@ -323,10 +323,17 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
     selected: OntologyTerm,
     notSelected: OntologyTerm[]
   ) => {
+    const generateId = () => crypto.randomUUID?.() || Math.random().toString(36).substring(2);
+    // For selection events use the recommendation's request_id; for other event types
+    // there is no originating recommendation request so a new UUID is generated.
+    const requestId = eventType === 'selection' && selected.request_id
+      ? selected.request_id
+      : generateId();
+
     const logData = {
       event_type: eventType,
-      request_id: selected.request_id || crypto.randomUUID?.() || Math.random().toString(36).substring(2),
-      event_id: crypto.randomUUID?.() || Math.random().toString(36).substring(2),
+      request_id: requestId,
+      event_id: generateId(),
       timestamp: new Date().toISOString(),
       element_id: element.id,
       element_name: element.name,
