@@ -4,6 +4,8 @@ import { Check, X, Plus, Search, Wand2, ChevronRight, ChevronDown, Trophy, Spark
 import { SuggestTermModal } from './SuggestTermModal';
 import { config } from '../config';
 
+type BehaviorEventType = 'selection' | 'custom_annotation' | 'removal';
+
 interface AnnotationEditorProps {
   elements: AnnotatableElement[];
   onUpdateElement: (id: string, updates: Partial<AnnotatableElement>) => void;
@@ -319,7 +321,7 @@ const AnnotationRow: React.FC<AnnotationRowProps> = ({ element, onUpdate, onSugg
    * Logs a behavior event to the server
    */
   const logBehavior = (
-    eventType: 'selection' | 'custom_annotation' | 'removal',
+    eventType: BehaviorEventType,
     selected: OntologyTerm,
     notSelected: OntologyTerm[]
   ) => {

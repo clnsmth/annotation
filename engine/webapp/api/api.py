@@ -22,7 +22,7 @@ from webapp.services.selection_strategies import (
 )
 from webapp.services.eml_parser import parse_eml, export_eml
 from webapp.services.audit import generate_audit_report
-from webapp.models.log_selection import LogBehavior
+from webapp.models.log_behavior import LogBehavior
 from webapp.models.document_request import ExportRequest, AuditRequest
 from webapp.config import Config
 from webapp.utils.utils import append_jsonl, read_jsonl

@@ -6,6 +6,8 @@ from datetime import datetime
 from typing import List, Literal
 from pydantic import BaseModel
 
+EventType = Literal["selection", "custom_annotation", "removal"]
+
 
 class SelectionItem(BaseModel):
     """
@@ -24,7 +26,7 @@ class LogBehavior(BaseModel):
     Pydantic model for validating the log-behavior POST payload.
     """
 
-    event_type: Literal["selection", "custom_annotation", "removal"]
+    event_type: EventType
     request_id: str
     event_id: str
     timestamp: datetime
@@ -33,8 +35,3 @@ class LogBehavior(BaseModel):
     element_type: str
     selected: SelectionItem
     not_selected: List[SelectionItem]
-
-
-# Backward-compatible alias retained to avoid breaking existing imports.
-# Should be removed once all callers have been updated to use LogBehavior directly.
-LogSelection = LogBehavior

@@ -210,7 +210,10 @@ curl http://localhost:8000/api/user-behavior
   this file directly.
 - `not_selected` captures the full set of candidates that were presented but not
   chosen. An empty array (`[]`) is used for `custom_annotation` and `removal` events
-  where no alternatives were presented.
+  where no alternatives were presented. Note: an empty `not_selected` can also occur
+  in a `selection` event when only one candidate was presented. Consumers should
+  therefore use `event_type` as the authoritative discriminator, not
+  `not_selected.length`.
 - `request_id` links a `selection` event to the originating `/api/recommendations`
   call, enabling downstream analysis to correlate model output with user decisions.
   For `custom_annotation` and `removal` events, `request_id` is a client-generated
