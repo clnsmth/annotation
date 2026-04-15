@@ -22,7 +22,7 @@ from webapp.services.selection_strategies import (
 )
 from webapp.services.eml_parser import parse_eml, export_eml
 from webapp.services.audit import generate_audit_report
-from webapp.models.log_selection import LogSelection
+from webapp.models.log_selection import LogBehavior
 from webapp.models.document_request import ExportRequest, AuditRequest
 from webapp.config import Config
 from webapp.utils.utils import append_jsonl, read_jsonl
@@ -114,13 +114,13 @@ def recommend_annotations(payload: Dict[str, Any] = Body(...)) -> JSONResponse:
         ) from e
 
 
-@router.post("/api/log-selection")
-async def log_selection(payload: LogSelection):
+@router.post("/api/log-behavior")
+async def log_behavior(payload: LogBehavior):
     """
-    Receives a log-selection POST payload, persists it to a JSONL file for
+    Receives a log-behavior POST payload, persists it to a JSONL file for
     use in training AI recommendation engines, and returns a status response.
 
-    :param payload: The validated log-selection payload
+    :param payload: The validated log-behavior payload
     :return: Status message indicating receipt
     :raises HTTPException: If an error occurs while persisting the event
     """
@@ -131,7 +131,7 @@ async def log_selection(payload: LogSelection):
     except Exception as e:
         logger.exception("Error persisting user behavior event: %s", e)
         raise HTTPException(
-            status_code=500, detail="Internal server error persisting selection event."
+            status_code=500, detail="Internal server error persisting behavior event."
         ) from e
 
 

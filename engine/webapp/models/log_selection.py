@@ -1,15 +1,15 @@
 """
-Pydantic models for validating log-selection POST requests in the annotation engine.
+Pydantic models for validating log-behavior POST requests in the annotation engine.
 """
 
 from datetime import datetime
-from typing import List
+from typing import List, Literal
 from pydantic import BaseModel
 
 
 class SelectionItem(BaseModel):
     """
-    Represents a selectable or non-selectable item in a log-selection event.
+    Represents a selectable or non-selectable item in a log-behavior event.
     """
 
     label: str
@@ -19,11 +19,12 @@ class SelectionItem(BaseModel):
     confidence: float
 
 
-class LogSelection(BaseModel):
+class LogBehavior(BaseModel):
     """
-    Pydantic model for validating the log-selection POST payload.
+    Pydantic model for validating the log-behavior POST payload.
     """
 
+    event_type: Literal["selection", "custom_annotation", "removal"]
     request_id: str
     event_id: str
     timestamp: datetime
@@ -32,3 +33,7 @@ class LogSelection(BaseModel):
     element_type: str
     selected: SelectionItem
     not_selected: List[SelectionItem]
+
+
+# Backward-compatible alias
+LogSelection = LogBehavior
