@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { FileUpload } from './components/FileUpload';
 import { AnnotationEditor } from './components/AnnotationEditor';
@@ -7,6 +7,8 @@ import { recommenderService } from './services/recommenderService';
 import { AnnotatableElement, OntologyTerm } from './types';
 import { Loader2, Download, CheckCircle, RotateCcw, AlertTriangle } from 'lucide-react';
 import { EXAMPLE_EML_XML } from './constants/mockData';
+
+const HIDE_SESSION_WARNING_KEY = 'sas_hideSessionWarning';
 
 export default function App() {
   const [step, setStep] = useState<'UPLOAD' | 'ANNOTATE' | 'EXPORT'>('UPLOAD');
@@ -18,6 +20,41 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [showSessionWarning, setShowSessionWarning] = useState(false);
+  const [dontShowSessionWarning, setDontShowSessionWarning] = useState(false);
+
+  // Show the session-persistence warning on first visit unless the user
+  // has previously opted out via the "Don't show again" checkbox.
+  useEffect(() => {
+    const hidden = localStorage.getItem(HIDE_SESSION_WARNING_KEY) === 'true';
+    if (!hidden) {
+      setShowSessionWarning(true);
+    }
+  }, []);
+
+  const dismissSessionWarning = () => {
+    if (dontShowSessionWarning) {
+      localStorage.setItem(HIDE_SESSION_WARNING_KEY, 'true');
+    }
+    setShowSessionWarning(false);
+  };
+
+  // Warn the user before leaving or refreshing the page when they have
+  // unsaved work. The browser always shows its own native confirmation
+  // dialog for beforeunload — custom dialogs are intentionally blocked by
+  // modern browsers for security reasons.
+  useEffect(() => {
+    if (step === 'UPLOAD') return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      // Setting returnValue is required for legacy browser support.
+      e.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [step]);
 
   // Reset Application State
   const resetApp = () => {
@@ -208,6 +245,46 @@ export default function App() {
           >
             Back to editing
           </button>
+        </div>
+      )}
+
+      {/* Session Persistence Warning Modal */}
+      {showSessionWarning && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-in zoom-in-95 duration-200 border border-slate-100">
+            <div className="flex items-start gap-4">
+              <div className="bg-amber-100 p-2.5 rounded-full shrink-0">
+                <AlertTriangle className="w-6 h-6 text-amber-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wide mb-1">Welcome to EDI Annotation Studio</p>
+                <h3 className="text-lg font-semibold text-slate-900">Your work is not saved between sessions</h3>
+                <p className="text-slate-600 mt-2 text-sm leading-relaxed">
+                  This application does not persist data between sessions. If you
+                  close or refresh the page before downloading your annotated EML
+                  file, your work will be lost. Make sure to download your file
+                  before leaving.
+                </p>
+                <label className="mt-4 flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={dontShowSessionWarning}
+                    onChange={e => setDontShowSessionWarning(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                  />
+                  <span className="text-sm text-slate-500">Don't show this message again</span>
+                </label>
+                <div className="mt-6 flex justify-end">
+                  <button
+                    onClick={dismissSessionWarning}
+                    className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors text-sm shadow-sm"
+                  >
+                    Got it
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
