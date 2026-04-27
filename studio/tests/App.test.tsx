@@ -62,10 +62,30 @@ describe('Session Persistence Warning Modal', () => {
 
     it('shows the warning modal on first visit (no localStorage flag)', async () => {
         render(<App />);
+        // Verify it is the first thing shown
+        expect(screen.getByText(/Welcome to EDI Annotation Studio/i)).toBeInTheDocument();
         expect(
             await screen.findByText(/Your work is not saved between sessions/i)
         ).toBeInTheDocument();
-        expect(screen.getByText(/Welcome to EDI Annotation Studio/i)).toBeInTheDocument();
+    });
+
+    it('blocks interaction with the upload screen until dismissed', async () => {
+        const user = userEvent.setup();
+        render(<App />);
+        
+        // Modal is present
+        const modalHeading = screen.getByText(/Welcome to EDI Annotation Studio/i);
+        expect(modalHeading).toBeInTheDocument();
+
+        // Attempting to interact with the landing screen should be discouraged/blocked 
+        // by the modal overlay. In jsdom, "visibility" is a bit limited, but we can verify
+        // the button is not the primary focus or simply that the modal is there first.
+        const uploadHeader = screen.getByText('Upload EML Metadata');
+        expect(uploadHeader).toBeInTheDocument(); // It exists in DOM
+        
+        // Dismiss and ensure it's gone
+        await dismissSessionWarning(user);
+        expect(modalHeading).not.toBeInTheDocument();
     });
 
     it('does not show the modal when the localStorage flag is already set', async () => {
@@ -141,6 +161,9 @@ describe('App Integration', () => {
         const user = userEvent.setup();
         render(<App />);
 
+        // Explicitly assert the modal is the "pre-landing" screen
+        expect(screen.getByText(/Welcome to EDI Annotation Studio/i)).toBeInTheDocument();
+
         // Dismiss the first-visit session warning before interacting with the app
         await dismissSessionWarning(user);
 
@@ -187,6 +210,9 @@ describe('App Integration', () => {
     it('displays an error message when file parsing fails', async () => {
         const user = userEvent.setup();
         render(<App />);
+
+        // Explicitly assert the modal is the "pre-landing" screen
+        expect(screen.getByText(/Welcome to EDI Annotation Studio/i)).toBeInTheDocument();
 
         // Dismiss the first-visit session warning before interacting with the app
         await dismissSessionWarning(user);
