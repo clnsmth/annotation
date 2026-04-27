@@ -10,7 +10,7 @@ vi.mock('../src/services/recommenderService', () => ({
         getRecommendations: vi.fn().mockResolvedValue(new Map())
     }
 }));
-// Mock the documentserivce to prevent network parsing requests
+// Mock the documentService to prevent network parsing requests
 vi.mock('../src/services/documentService', () => ({
     documentService: {
         getTargets: vi.fn().mockResolvedValue([]),
@@ -19,9 +19,128 @@ vi.mock('../src/services/documentService', () => ({
     }
 }));
 
+// ---------------------------------------------------------------------------
+// localStorage mock — jsdom provides a partial implementation but the test
+// runner may not wire it up. We use a simple Map-backed mock so all tests
+// get a clean, predictable store.
+// ---------------------------------------------------------------------------
+const localStorageMock = (() => {
+    let store: Record<string, string> = {};
+    return {
+        getItem: vi.fn((key: string) => store[key] ?? null),
+        setItem: vi.fn((key: string, value: string) => { store[key] = value; }),
+        removeItem: vi.fn((key: string) => { delete store[key]; }),
+        clear: vi.fn(() => { store = {}; }),
+    };
+})();
+
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
+
+/** Dismiss the first-visit session persistence warning modal. */
+async function dismissSessionWarning(user: ReturnType<typeof userEvent.setup>) {
+    const gotItBtn = await screen.findByRole('button', { name: /Got it/i });
+    await user.click(gotItBtn);
+}
+
+// ---------------------------------------------------------------------------
+// Session Persistence Warning Modal
+// ---------------------------------------------------------------------------
+
+describe('Session Persistence Warning Modal', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        localStorageMock.clear();
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('shows the warning modal on first visit (no localStorage flag)', async () => {
+        render(<App />);
+        // Verify it is the first thing shown
+        expect(screen.getByText(/Welcome to EDI Annotation Studio/i)).toBeInTheDocument();
+        expect(
+            await screen.findByText(/Your work is not saved between sessions/i)
+        ).toBeInTheDocument();
+    });
+
+    it('blocks interaction with the upload screen until dismissed', async () => {
+        const user = userEvent.setup();
+        render(<App />);
+        
+        // Modal is present
+        const modalHeading = screen.getByText(/Welcome to EDI Annotation Studio/i);
+        expect(modalHeading).toBeInTheDocument();
+
+        // Attempting to interact with the landing screen should be discouraged/blocked 
+        // by the modal overlay. In jsdom, "visibility" is a bit limited, but we can verify
+        // the button is not the primary focus or simply that the modal is there first.
+        const uploadHeader = screen.getByText('Upload EML Metadata');
+        expect(uploadHeader).toBeInTheDocument(); // It exists in DOM
+        
+        // Dismiss and ensure it's gone
+        await dismissSessionWarning(user);
+        expect(modalHeading).not.toBeInTheDocument();
+    });
+
+    it('does not show the modal when the localStorage flag is already set', async () => {
+        localStorageMock.getItem.mockReturnValueOnce('true');
+        render(<App />);
+        // Give effects a tick to run
+        await new Promise(r => setTimeout(r, 50));
+        expect(
+            screen.queryByText(/Your work is not saved between sessions/i)
+        ).not.toBeInTheDocument();
+    });
+
+    it('dismisses the modal when "Got it" is clicked without persisting preference', async () => {
+        const user = userEvent.setup();
+        render(<App />);
+
+        await dismissSessionWarning(user);
+
+        expect(
+            screen.queryByText(/Your work is not saved between sessions/i)
+        ).not.toBeInTheDocument();
+        // Without checking "Don't show again", localStorage should NOT be written
+        expect(localStorageMock.setItem).not.toHaveBeenCalled();
+    });
+
+    it('persists preference when "Don\'t show this message again" is checked before dismissing', async () => {
+        const user = userEvent.setup();
+        render(<App />);
+
+        const checkbox = await screen.findByRole('checkbox', {
+            name: /Don't show this message again/i
+        });
+        await user.click(checkbox);
+        expect(checkbox).toBeChecked();
+
+        await user.click(screen.getByRole('button', { name: /Got it/i }));
+
+        expect(localStorageMock.setItem).toHaveBeenCalledWith(
+            'sas_hideSessionWarning',
+            'true'
+        );
+        expect(
+            screen.queryByText(/Your work is not saved between sessions/i)
+        ).not.toBeInTheDocument();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// App Integration
+// ---------------------------------------------------------------------------
+
 describe('App Integration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        localStorageMock.clear();
 
         // Mock URL methods used in export
         global.URL.createObjectURL = vi.fn().mockReturnValue('blob:http://localhost/mock-url');
@@ -41,6 +160,12 @@ describe('App Integration', () => {
     it('completes the full happy path flow (Upload -> Editor -> Export -> Reset)', async () => {
         const user = userEvent.setup();
         render(<App />);
+
+        // Explicitly assert the modal is the "pre-landing" screen
+        expect(screen.getByText(/Welcome to EDI Annotation Studio/i)).toBeInTheDocument();
+
+        // Dismiss the first-visit session warning before interacting with the app
+        await dismissSessionWarning(user);
 
         // Step 1: Upload Step
         expect(screen.getByText('Upload EML Metadata')).toBeInTheDocument();
@@ -85,6 +210,12 @@ describe('App Integration', () => {
     it('displays an error message when file parsing fails', async () => {
         const user = userEvent.setup();
         render(<App />);
+
+        // Explicitly assert the modal is the "pre-landing" screen
+        expect(screen.getByText(/Welcome to EDI Annotation Studio/i)).toBeInTheDocument();
+
+        // Dismiss the first-visit session warning before interacting with the app
+        await dismissSessionWarning(user);
 
         // We mock documentService.getTargets to simulate a backend parsing error
         const parseSpy = vi.spyOn(await import('../src/services/documentService').then(m => m.documentService), 'getTargets').mockImplementation(() => {

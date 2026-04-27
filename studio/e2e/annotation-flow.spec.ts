@@ -5,7 +5,12 @@ test.describe('Annotation Studio End-to-End', () => {
         // 1. Navigate to the App
         await page.goto('/');
 
-        // 2. Verify Upload Screen
+        // 2. Handle Session Persistence Warning (Pre-landing screen)
+        await expect(page.locator('text=Welcome to EDI Annotation Studio')).toBeVisible();
+        await expect(page.locator('text=Your work is not saved between sessions')).toBeVisible();
+        await page.getByRole('button', { name: 'Got it' }).click();
+
+        // 3. Verify Upload Screen
         await expect(page.locator('text=Upload EML Metadata')).toBeVisible();
 
         // 3. Toggle AI Recommendations On

@@ -2,8 +2,15 @@ import { test, expect } from '@playwright/test';
 import mockTargets from './mock-targets.json' assert { type: 'json' };
 test.describe('Annotation Studio Visual Regression', () => {
     test('verifies UI components match baseline snapshots', async ({ page }) => {
-        // 1. Landing Screen (Upload)
+        // 1. Session Persistence Warning (Pre-landing)
         await page.goto('/');
+        await expect(page.locator('text=Welcome to EDI Annotation Studio')).toBeVisible();
+        await expect(page).toHaveScreenshot('session-persistence-modal.png', { fullPage: true });
+        
+        // Dismiss the modal to reach the Landing Screen
+        await page.getByRole('button', { name: 'Got it' }).click();
+
+        // 2. Landing Screen (Upload)
         await expect(page.locator('text=Upload EML Metadata')).toBeVisible();
         await expect(page).toHaveScreenshot('landing-screen.png', { fullPage: true });
 
